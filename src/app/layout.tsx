@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Open_Sans, Playwrite_NG_Modern } from "next/font/google";
 import "./globals.css";
-import Dashboard from "@/components/dashboard/dashboard-layout";
+import { ThemeProvider } from "@/components/theme-provider";
+import Navbar from "@/components/common/Navbar";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -22,13 +23,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${openSans.className} ${playWriteNg.variable} antialiased`}
       >
-        <Dashboard>
-        {children}
-        </Dashboard>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

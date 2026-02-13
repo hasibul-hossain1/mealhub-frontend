@@ -24,7 +24,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { HiArrowNarrowLeft } from "react-icons/hi"
-import { RxHamburgerMenu } from "react-icons/rx"
+import { RxCross2, RxHamburgerMenu } from "react-icons/rx"
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
@@ -188,7 +188,7 @@ function Sidebar({
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
+          className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0"
           style={
             {
               "--sidebar-width": SIDEBAR_WIDTH_MOBILE,
@@ -259,7 +259,7 @@ function SidebarTrigger({
   onClick,
   ...props
 }: React.ComponentProps<typeof Button>) {
-  const { toggleSidebar, state, isMobile } = useSidebar()
+  const { toggleSidebar, state, isMobile, openMobile } = useSidebar()
   return (
       <Button
         data-sidebar="trigger"
@@ -273,7 +273,7 @@ function SidebarTrigger({
         }}
         {...props}
       >
-        {isMobile ? <RxHamburgerMenu /> : <HiArrowNarrowLeft size={20} className={cn(state === "collapsed" ? "rotate-180" : "", "duration-150")} />
+        {isMobile ? (openMobile ? <RxCross2 /> : <RxHamburgerMenu />) : <HiArrowNarrowLeft size={20} className={cn(state === "collapsed" ? "rotate-180" : "", "duration-150")} />
         }
         <span className="sr-only">Toggle Sidebar</span>
       </Button>
