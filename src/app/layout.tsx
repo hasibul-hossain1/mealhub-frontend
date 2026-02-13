@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Open_Sans, Playwrite_NG_Modern } from "next/font/google";
 import "./globals.css";
+import Dashboard from "@/components/dashboard/dashboard-layout";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const openSans = Open_Sans({
+  variable: "--font-open-sans",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const playWriteNg = Playwrite_NG_Modern({
+  variable: "--font-playwrite-ng",
 });
 
 export const metadata: Metadata = {
@@ -25,9 +24,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${openSans.className} ${playWriteNg.variable} antialiased`}
       >
+        <Dashboard>
         {children}
+        </Dashboard>
       </body>
     </html>
   );
