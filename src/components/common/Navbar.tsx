@@ -1,5 +1,3 @@
-"use client"
-
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,7 +27,7 @@ function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 border-b border-border shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <nav className="sticky top-0 w-full z-50 bg-background/95 border-b border-border shadow-sm backdrop-blur supports-backdrop-filter:bg-background/80">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Left - Mobile menu + Logo */}
