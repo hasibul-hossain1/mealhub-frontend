@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import type { MealsResponse } from "@/types/meal.type";
+import type { Meal, MealDetailsResponse, MealsResponse } from "@/types/meal.type";
 
 type MealParams = {
   page?: string;
@@ -24,11 +24,21 @@ export const mealService = {
           }
         });
       }
-      const res = await fetch(url.toString());
+      const res = await fetch(url.toString(), { cache: "no-store" });
       const data = (await res.json()) as MealsResponse;
       return { data, error: null };
     } catch (error) {
       return { data: null as MealsResponse | null, error };
+    }
+  },
+  getMealById: async (id: string) => {
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/meals/${id}`, { cache: "no-store" });
+      const payload = (await res.json()) as MealDetailsResponse | Meal;
+      const data = "data" in payload ? payload : ({ data: payload } as MealDetailsResponse);
+      return { data, error: null };
+    } catch (error) {
+      return { data: null as MealDetailsResponse | null, error };
     }
   },
 };

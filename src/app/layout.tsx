@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Open_Sans, Playwrite_NG_Modern } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "sonner";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -29,6 +30,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
+        <Toaster richColors position="top-center"/>
       </body>
     </html>
   );

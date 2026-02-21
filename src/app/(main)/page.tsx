@@ -5,7 +5,6 @@ import WhyChooseUs from "@/components/home/WhyChooseUs";
 import GetUpdates from "@/components/home/GetUpdates";
 import Faq from "@/components/home/Faq";
 
-export const dynamic = "force-dynamic";
 
 
 async function HomePage() {

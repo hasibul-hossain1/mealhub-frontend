@@ -99,9 +99,10 @@ function Navbar() {
             <Button 
               variant="outline" 
               size="sm"
-              className="inline-flex border-orange-500 text-orange-500 hover:bg-primary/10"
+              className="inline-flex border-orange-500 text-orange-500 hover:text-primary hover:bg-primary/10"
+              asChild
             >
-              Sign In
+              <Link href="/signin">Sign In</Link>
             </Button>
             <Button 
               size="sm"
