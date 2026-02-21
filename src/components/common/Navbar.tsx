@@ -13,18 +13,21 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
+import GetStarted from './GetStarted'
 
-type NavLink = {label:string; href:string}
-function Navbar() {
+type NavLink = { label: string; href: string }
 
-  const navLinks:NavLink[] = [
-    { label: 'Home', href: '/' },
-    { label: 'Browse Meals', href: '/meals' },
-    { label: 'Restaurants', href: '/restaurants' },
-    { label: 'Contact', href: '/contact' },
-    {label:"About", href:"/about"},
-    {label:"Careers", href:"/careers"}
-  ]
+const navLinks: NavLink[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Browse Meals', href: '/meals' },
+  { label: 'Restaurants', href: '/restaurants' },
+  { label: 'Contact', href: '/contact' },
+  { label: "About", href: "/about" },
+  { label: "Careers", href: "/careers" }
+]
+
+async function Navbar() {
+
 
   return (
     <nav className="sticky top-0 w-full z-50 bg-background/95 border-b border-border shadow-sm backdrop-blur supports-backdrop-filter:bg-background/80">
@@ -96,20 +99,8 @@ function Navbar() {
           {/* Right - Action buttons */}
           <div className="flex items-center gap-2 sm:gap-4">
             <ModeToggle />
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="inline-flex border-orange-500 text-orange-500 hover:text-primary hover:bg-primary/10"
-              asChild
-            >
-              <Link href="/signin">Sign In</Link>
-            </Button>
-            <Button 
-              size="sm"
-              className="inline-flex bg-orange-500 hover:bg-orange-600 text-white"
-            >
-              Get Started
-            </Button>
+            <GetStarted/>
+
           </div>
         </div>
       </div>

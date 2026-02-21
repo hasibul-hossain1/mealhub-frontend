@@ -44,7 +44,7 @@ function Signin() {
 
   return (
     <div className="grid w-full overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-xl backdrop-blur sm:max-w-4xl sm:grid-cols-2">
-      <div className="relative hidden overflow-hidden border-r border-border/60 bg-[radial-gradient(circle_at_top,_hsl(var(--primary)/0.22),_transparent_58%),linear-gradient(120deg,_hsl(var(--accent)/0.3),_hsl(var(--background)))] p-8 sm:block">
+      <div className="relative hidden overflow-hidden border-r border-border/60 bg-[radial-gradient(circle_at_top,hsl(var(--primary)/0.22),transparent_58%),linear-gradient(120deg,hsl(var(--accent)/0.3),hsl(var(--background)))] p-8 sm:block">
         <div className="absolute -left-16 top-6 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute bottom-4 right-3 h-44 w-44 rounded-full bg-accent/35 blur-3xl" />
 
