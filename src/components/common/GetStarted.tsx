@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu'
-import { Loader2, LogOut } from 'lucide-react'
+import { LayoutDashboard, Loader2, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 
 type SessionUserView = {
@@ -107,6 +107,13 @@ function GetStarted() {
               <p className="text-muted-foreground text-xs">Role</p>
               <p className="text-sm font-medium">{roleLabel}</p>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard">
+                <LayoutDashboard className="size-4" />
+                Dashboard
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem disabled={isRefetching} onClick={handleLogout} variant="destructive">
               {isRefetching ? <Loader2 className="size-4 animate-spin" /> : <LogOut className="size-4" />}

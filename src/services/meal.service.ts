@@ -1,5 +1,5 @@
 import { env } from "@/env";
-import type { Meal, MealDetailsResponse, MealsResponse } from "@/types/meal.type";
+import type { Meal, MealCategory, MealDetailsResponse, MealsResponse } from "@/types/meal.type";
 
 type MealParams = {
   page?: string;
@@ -39,6 +39,28 @@ export const mealService = {
       return { data, error: null };
     } catch (error) {
       return { data: null as MealDetailsResponse | null, error };
+    }
+  },
+  getMealCategories: async () => {
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/meals/categories`, { cache: "no-store" });
+      const payload = (await res.json()) as
+        | { data?: MealCategory[] | { data?: MealCategory[] | { data?: MealCategory[] } } }
+        | MealCategory[];
+
+      const categories = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : Array.isArray(payload?.data?.data)
+            ? payload.data.data
+            : Array.isArray(payload?.data?.data?.data)
+              ? payload.data.data.data
+            : [];
+
+      return { data: categories, error: null };
+    } catch (error) {
+      return { data: [] as MealCategory[], error };
     }
   },
 };

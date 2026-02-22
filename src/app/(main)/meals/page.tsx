@@ -11,8 +11,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+import { env } from "@/env"
 import { mealService } from "@/services/meal.service"
-import type { Meal, MealsResponse } from "@/types/meal.type"
+import type { Meal, MealCategory, MealsResponse } from "@/types/meal.type"
 import AutoQueryNumberInput from "./components/AutoQueryNumberInput"
 import AutoQuerySelect from "./components/AutoQuerySelect"
 import SearchMeal from "./components/SearchMeal"
@@ -62,6 +63,18 @@ function extractMealList(payload: MealsResponse | null): Meal[] {
   return payload?.data?.data ?? []
 }
 
+function extractCategoryList(payload: unknown): MealCategory[] {
+  if (Array.isArray(payload)) {
+    return payload as MealCategory[]
+  }
+
+  if (payload && typeof payload === "object" && "data" in payload) {
+    return extractCategoryList((payload as { data?: unknown }).data)
+  }
+
+  return []
+}
+
 function mapToBrowseMeal(meal: Meal): BrowseMeal | null {
   if (!meal.id || !meal.foodName || typeof meal.price !== "number") {
     return null
@@ -98,16 +111,21 @@ async function MealsPage({ searchParams }: MealsPageProps) {
   const selectedMaxPrice = toSingleValue(resolvedSearchParams.maxPrice)
   const selectedPage = toPositiveInt(toSingleValue(resolvedSearchParams.page), 1)
 
-  const { data, error } = await mealService.getMeals({
-    page: String(selectedPage),
-    search: search || undefined,
-    category: selectedCategory === "All" ? undefined : selectedCategory,
-    minPrice: selectedMinPrice || undefined,
-    maxPrice: selectedMaxPrice || undefined,
-    available,
-    sortBy,
-    sortOrder,
-  })
+  const [{ data, error }, categoryResponse] = await Promise.all([
+    mealService.getMeals({
+      page: String(selectedPage),
+      search: search || undefined,
+      category: selectedCategory === "All" ? undefined : selectedCategory,
+      minPrice: selectedMinPrice || undefined,
+      maxPrice: selectedMaxPrice || undefined,
+      available,
+      sortBy,
+      sortOrder,
+    }),
+    fetch(`${env.BACKEND_URL}/meals/categories`, { cache: "no-store" })
+      .then((res) => res.json())
+      .catch(() => null),
+  ])
 
   if (error) {
     return (
@@ -123,15 +141,22 @@ async function MealsPage({ searchParams }: MealsPageProps) {
     .map(mapToBrowseMeal)
     .filter((meal): meal is BrowseMeal => Boolean(meal))
 
+  const apiCategories = extractCategoryList(categoryResponse)
+  const categoriesFromApi = apiCategories
+    .filter((category): category is MealCategory => Boolean(category?.name && category.name.trim().length > 0))
+    .map((category) => {
+      const name = category.name.trim()
+      return { label: name, value: name }
+    })
+
+  const categoryOptions = [...categoriesFromApi]
+  if (selectedCategory !== "All" && !categoryOptions.some((item) => item.value === selectedCategory)) {
+    categoryOptions.push({ label: selectedCategory, value: selectedCategory })
+  }
+
   const categories = [
     { label: "All", value: "All" },
-    ...Array.from(
-      new Map(
-        allMeals
-          .filter((meal) => meal.categoryId && meal.categoryName)
-          .map((meal) => [meal.categoryName, { label: meal.categoryName, value: meal.categoryName }]),
-      ).values(),
-    ),
+    ...Array.from(new Map(categoryOptions.map((item) => [item.value, item])).values()),
   ]
   const priceFloor = allMeals.length ? Math.floor(Math.min(...allMeals.map((meal) => meal.price))) : 0
   const priceCeil = allMeals.length ? Math.ceil(Math.max(...allMeals.map((meal) => meal.price))) : 0

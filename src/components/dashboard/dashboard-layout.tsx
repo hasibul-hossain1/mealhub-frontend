@@ -5,6 +5,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import Image from "next/image"
+import Link from "next/link"
 import { Button } from "../ui/button"
 import { ModeToggle } from "./ModeToggle"
 
@@ -28,7 +29,9 @@ export default function Dashboard({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-2">
             <ModeToggle />
-            <Button>Profile</Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/">Go Home</Link>
+            </Button>
           </div>
         </header>
         {/* Here the children will render */}

@@ -13,6 +13,14 @@ export interface MealReview {
   rating: number
   comment: string | null
   createdAt: string
+  user?: {
+    name?: string | null
+    image?: string | null
+  } | null
+  userName?: string | null
+  userImage?: string | null
+  name?: string | null
+  image?: string | null
 }
 
 export interface MealSeller {

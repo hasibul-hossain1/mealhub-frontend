@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { mealService } from "@/services/meal.service"
 import type { Meal } from "@/types/meal.type"
 
@@ -10,6 +11,8 @@ type MealDetailsPageProps = {
     id: string
   }>
 }
+
+type ReviewItem = NonNullable<Meal["reviews"]>[number]
 
 async function MealDetailsPage({ params }: MealDetailsPageProps) {
   const { id } = await params
@@ -24,7 +27,7 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
     notFound()
   }
 
-  const getText = (value: unknown, fallback = "Coming soon") =>
+  const getText = (value: unknown, fallback = "Not Found") =>
     typeof value === "string" && value.trim().length > 0 ? value : fallback
 
   const getDate = (value: unknown) => {
@@ -32,6 +35,22 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
     const parsed = new Date(value)
     return Number.isNaN(parsed.getTime()) ? "Coming soon" : parsed.toLocaleDateString()
   }
+
+  const getReviewerName = (review: ReviewItem) =>
+    getText(review.user?.name ?? review.userName ?? review.name, "Anonymous user")
+
+  const getReviewerImage = (review: ReviewItem) => {
+    const image = review.user?.image ?? review.userImage ?? review.image
+    return typeof image === "string" && image.trim().length > 0 ? image : ""
+  }
+
+  const getInitials = (value: string) =>
+    value
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join("") || "U"
 
   const formatRating = (value: unknown) =>
     typeof value === "number" && Number.isFinite(value) ? value.toFixed(1) : "N/A"
@@ -65,11 +84,11 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
 
   return (
     <section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-extrabold sm:text-3xl">{foodName}</h1>
+      <div className="mb-6 flex items-center gap-3">
         <Button asChild variant="outline" className="shrink-0">
           <Link href="/meals">Back to meals</Link>
         </Button>
+        <h1 className="text-2xl font-extrabold sm:text-3xl">{foodName}</h1>
       </div>
 
       <article className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
@@ -93,7 +112,9 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
               <p className="text-3xl font-extrabold tracking-tight">{priceLabel}</p>
             </div>
 
+            <h3 className="text-lg font-medium">Description</h3>
             <p className="text-sm leading-6 text-muted-foreground">{description}</p>
+
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-xl border border-border/80 bg-muted/30 p-3">
@@ -108,7 +129,12 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
               <p className="text-sm text-muted-foreground">Meal details update automatically when API data changes.</p>
-              <Button disabled={availabilityState !== "Available" || !hasValidPrice}>Buy Now</Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" disabled={availabilityState !== "Available" || !hasValidPrice}>
+                  Add to cart
+                </Button>
+                <Button disabled={availabilityState !== "Available" || !hasValidPrice}>Buy Now</Button>
+              </div>
             </div>
           </div>
         </div>
@@ -176,8 +202,17 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
             <div className="space-y-3">
               {reviewsList.slice(0, 4).map((review) => (
                 <div key={review.id} className="rounded-xl border border-border/80 bg-muted/30 p-3">
-                  <div className="mb-2 flex items-center justify-between gap-3">
-                    <p className="text-sm font-semibold">Rating: {formatRating(review.rating)}</p>
+                  <div className="mb-2 flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <Avatar size="sm">
+                        <AvatarImage src={getReviewerImage(review)} alt={getReviewerName(review)} />
+                        <AvatarFallback>{getInitials(getReviewerName(review))}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-semibold">{getReviewerName(review)}</p>
+                        <p className="text-xs text-muted-foreground">Rating: {formatRating(review.rating)}</p>
+                      </div>
+                    </div>
                     <p className="text-xs text-muted-foreground">{getDate(review.createdAt)}</p>
                   </div>
                   <p className="text-sm text-muted-foreground">{getText(review.comment, "No comment provided.")}</p>
