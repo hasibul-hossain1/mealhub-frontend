@@ -1,7 +1,7 @@
 /* 
 *
 * 1.
-* 2. sign up functionality
+* 2. 
 * 3. dashboard settings for user
 *
 */

@@ -8,30 +8,54 @@ export async function proxy(req: NextRequest) {
 
   const isAuthenticated = !!session;
   const role = session?.user?.role;
+  const isDashboardPath =
+    pathname === "/dashboard" ||
+    pathname.startsWith("/admin-dashboard") ||
+    pathname.startsWith("/seller-dashboard");
 
   // 🚫 Not logged in → block dashboard
-  if (pathname.startsWith("/dashboard") && !isAuthenticated) {
+  if (isDashboardPath && !isAuthenticated) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
   // 🚫 Logged in → block signin
-  if (pathname.startsWith("/signin") && isAuthenticated || pathname.startsWith("/signup") && isAuthenticated ) {
+  if (
+    (pathname.startsWith("/signin") || pathname.startsWith("/signup")) &&
+    isAuthenticated
+  ) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
   // 🔐 Role based dashboard routing
-  if (pathname.startsWith("/dashboard")) {
-    if (role === Role.ADMIN && !pathname.startsWith("/dashboard/admin")) {
-      return NextResponse.redirect(new URL("/dashboard/admin", req.url));
+  if (isDashboardPath) {
+    // Admin route protection
+    if (pathname.startsWith("/admin-dashboard") && role !== Role.ADMIN) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    if (role === Role.SELLER && !pathname.startsWith("/dashboard/seller")) {
-      return NextResponse.redirect(new URL("/dashboard/seller", req.url));
+    // Seller route protection
+    if (pathname.startsWith("/seller-dashboard") && role !== Role.SELLER) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
-    // normal user cannot access dashboard
-    if (role !== Role.ADMIN && role !== Role.SELLER) {
-      return NextResponse.redirect(new URL("/", req.url));
+    // Base user dashboard protection
+    if (pathname === "/dashboard" && role !== Role.CUSTOMER) {
+      if (role === Role.ADMIN) {
+        return NextResponse.redirect(new URL("/admin-dashboard", req.url));
+      }
+
+      if (role === Role.SELLER) {
+        return NextResponse.redirect(new URL("/seller-dashboard", req.url));
+      }
+    }
+
+    // Optional redirect from role dashboards to their own route
+    if (role === Role.ADMIN && pathname === "/dashboard") {
+      return NextResponse.redirect(new URL("/admin-dashboard", req.url));
+    }
+
+    if (role === Role.SELLER && pathname === "/dashboard") {
+      return NextResponse.redirect(new URL("/seller-dashboard", req.url));
     }
   }
 
@@ -39,5 +63,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/signin","/signup", "/dashboard/:path*"],
+  matcher: ["/signin", "/signup", "/dashboard", "/admin-dashboard/:path*", "/seller-dashboard/:path*"],
 };
