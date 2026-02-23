@@ -74,7 +74,7 @@ function GetStarted() {
           className="inline-flex bg-orange-500 hover:bg-orange-600 text-white"
           asChild
         >
-          <Link href={"/signup"}>Get Started</Link>
+          <Link href={"/signup"}>Signup</Link>
         </Button>
       </>
     )
@@ -136,7 +136,7 @@ function GetStarted() {
             className="inline-flex bg-orange-500 hover:bg-orange-600 text-white"
             asChild
           >
-            <Link href={"/signup"}>Get Started</Link>
+            <Link href={"/signup"}>Signup</Link>
           </Button>
         </>
       )}

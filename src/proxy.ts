@@ -15,7 +15,7 @@ export async function proxy(req: NextRequest) {
   }
 
   // 🚫 Logged in → block signin
-  if (pathname.startsWith("/signin") && isAuthenticated) {
+  if (pathname.startsWith("/signin") && isAuthenticated || pathname.startsWith("/signup") && isAuthenticated ) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
@@ -39,5 +39,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/signin", "/dashboard/:path*"],
+  matcher: ["/signin","/signup", "/dashboard/:path*"],
 };
