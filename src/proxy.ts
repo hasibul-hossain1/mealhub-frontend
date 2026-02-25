@@ -3,11 +3,11 @@ import { userService } from "./services/user.service";
 import { Role } from "@/constant/role";
 
 export async function proxy(req: NextRequest) {
-  const { session } = await userService.getSession();
+  const { user, session } = await userService.getSession();
   const pathname = req.nextUrl.pathname;
 
-  const isAuthenticated = !!session;
-  const role = session?.user?.role;
+  const isAuthenticated = Boolean(user && session);
+  const role = user?.role;
   const isDashboardPath =
     pathname === "/dashboard" ||
     pathname.startsWith("/admin-dashboard") ||

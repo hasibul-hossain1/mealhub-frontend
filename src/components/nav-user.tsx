@@ -1,13 +1,15 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
+  House,
+  Loader2,
   LogOut,
-  Sparkles,
 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { toast } from "sonner"
 
 import {
   Avatar,
@@ -29,6 +31,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { authClient } from "@/lib/auth-client"
 
 export function NavUser({
   user,
@@ -37,9 +40,34 @@ export function NavUser({
     name: string
     email: string
     avatar: string
+    role: string
   }
 }) {
   const { isMobile } = useSidebar()
+  const router = useRouter()
+  const [isSigningOut, setIsSigningOut] = useState(false)
+
+  const handleLogout = async () => {
+    if (isSigningOut) return
+    setIsSigningOut(true)
+    const toastId = toast.loading("Signing out...")
+
+    try {
+      const response = await authClient.signOut()
+      if (response?.error) {
+        toast.error(response.error.message || "Failed to sign out.", { id: toastId })
+        return
+      }
+
+      toast.success("Signed out successfully.", { id: toastId })
+      router.push("/signin")
+      router.refresh()
+    } catch (logoutError: any) {
+      toast.error(logoutError?.message || "Failed to sign out.", { id: toastId })
+    } finally {
+      setIsSigningOut(false)
+    }
+  }
 
   return (
     <SidebarMenu>
@@ -82,29 +110,20 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+                <span className="text-sm">Role:</span> <br />
+                <span>{user.role}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/">
+                  <House />
+                  Go Back Home
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
+            <DropdownMenuItem disabled={isSigningOut} onClick={handleLogout}>
+              {isSigningOut ? <Loader2 className="animate-spin" /> : <LogOut />}
+              {isSigningOut ? "Logging out..." : "Log out"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

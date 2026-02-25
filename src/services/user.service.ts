@@ -9,14 +9,17 @@ export const userService = {
           cookie: cookieStore.toString(),
         },
       });
-      const session = await res.json();
-      return { session, error: null };
+      const payload = await res.json();
+      const authData = payload?.data ?? payload;
+      const user = authData?.user ?? null;
+      const session = authData?.session ?? null;
+      return { user, session, error: null };
     } catch (error: any) {
       return {
+        user: null,
         session: null,
         error: error.message || "An error occurred while fetching the session.",
       };
     }
   },
 };
-

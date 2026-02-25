@@ -1,173 +1,127 @@
 "use client"
 
-import * as React from "react"
+import type React from "react"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  LayoutDashboard,
+  Loader2,
+  Settings,
+  ShoppingBasket,
+  ShoppingBag,
+  ShoppingCart,
+  Store,
+  Users,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
+import { Role } from "@/constant/role"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
 import SidebarLogo from "./dashboard/sidebar-logo"
+import { authClient } from "@/lib/auth-client"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  role: string
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+type SessionUserView = {
+  name?: string | null
+  email?: string | null
+  image?: string | null
+  role?: string | null
+}
+
+export function AppSidebar({ role, ...props }: AppSidebarProps) {
+  const pathname = usePathname()
+  const { data, error, isPending } = authClient.useSession()
+  const sessionUser = data?.user as SessionUserView | undefined
+  const resolvedRole = sessionUser?.role ?? role
+
+  const userMenus = [
+    { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { title: "Browse Meals", href: "/meals", icon: ShoppingBag },
+    { title: "Restaurants", href: "/restaurants", icon: Store },
+    { title: "Cart", href: "/cart", icon: ShoppingCart },
+  ]
+
+  const sellerMenus = [
+    { title: "Seller Dashboard", href: "/seller-dashboard", icon: LayoutDashboard },
+    { title: "My Meals", href: "/meals", icon: ShoppingBasket },
+    { title: "Settings", href: "/dashboard/settings", icon: Settings },
+  ]
+
+  const adminMenus = [
+    { title: "Admin Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
+    { title: "Users", href: "/dashboard/users", icon: Users },
+    { title: "Restaurants", href: "/restaurants", icon: Store },
+    { title: "Settings", href: "/dashboard/settings", icon: Settings },
+  ]
+
+  const menus = resolvedRole === Role.ADMIN ? adminMenus : resolvedRole === Role.SELLER ? sellerMenus : userMenus
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
       <SidebarLogo/>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <SidebarGroup>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarMenu>
+            {menus.map((menu) => (
+              <SidebarMenuItem key={menu.title}>
+                <SidebarMenuButton asChild isActive={pathname === menu.href}>
+                  <Link href={menu.href}>
+                    <menu.icon />
+                    <span>{menu.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {isPending ? (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton disabled>
+                <Loader2 className="animate-spin" />
+                <span>Loading session...</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        ) : error || !sessionUser ? (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/signin">
+                  <span>Sign in</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        ) : (
+          <NavUser
+            user={{
+              name: sessionUser.name || "User",
+              email: sessionUser.email || "No email",
+              avatar: sessionUser.image || "",
+              role: resolvedRole || "UNKNOWN",
+            }}
+          />
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

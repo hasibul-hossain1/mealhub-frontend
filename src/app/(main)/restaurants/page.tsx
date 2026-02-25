@@ -147,6 +147,12 @@ async function page({ searchParams }: RestaurantsPageProps) {
                   {restaurant.isProfileCompleted ? "Profile Complete" : "Profile Incomplete"}
                 </span>
               </div>
+
+              <div className="mt-4">
+                <Button asChild size="sm">
+                  <Link href={`/restaurants/${restaurant.id}`}>View details</Link>
+                </Button>
+              </div>
             </article>
           ))}
         </div>

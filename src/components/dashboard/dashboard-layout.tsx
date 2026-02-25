@@ -9,10 +9,10 @@ import Link from "next/link"
 import { Button } from "../ui/button"
 import { ModeToggle } from "./ModeToggle"
 
-export default function Dashboard({ children }: { children: React.ReactNode }) {
+export default function Dashboard({ children, role }: { children: React.ReactNode; role: string }) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar role={role} />
       <SidebarInset>
         <header className="flex bg-sidebar relative shadow-[0_4px_6px_rgba(0,0,0,0.1)] h-16 justify-between px-4 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
           <div className="flex items-center gap-2 flex-1 md:flex-none">
