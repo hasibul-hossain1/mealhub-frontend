@@ -3,6 +3,7 @@ import { Open_Sans, Playwrite_NG_Modern } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
+import CartProvider from "@/providers/cart-provider";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -27,10 +28,12 @@ export default function RootLayout({
       <body
         className={`${openSans.className} ${playWriteNg.variable} antialiased`}
       >
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          <CartProvider>
+            {children}
+          </CartProvider>
         </ThemeProvider>
-        <Toaster richColors position="top-center"/>
+        <Toaster richColors position="top-center" />
       </body>
     </html>
   );

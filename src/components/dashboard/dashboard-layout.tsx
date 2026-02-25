@@ -14,7 +14,7 @@ export default function Dashboard({ children, role }: { children: React.ReactNod
     <SidebarProvider>
       <AppSidebar role={role} />
       <SidebarInset>
-        <header className="flex bg-sidebar relative shadow-[0_4px_6px_rgba(0,0,0,0.1)] h-16 justify-between px-4 shrink-0 items-center gap-2 transition-[width,height] ease-linear">
+        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-2 bg-sidebar px-4 shadow-[0_4px_6px_rgba(0,0,0,0.1)] transition-[width,height] ease-linear">
           <div className="flex items-center gap-2 flex-1 md:flex-none">
             <SidebarTrigger className="z-50" />
           </div>

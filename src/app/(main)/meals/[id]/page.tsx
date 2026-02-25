@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { mealService } from "@/services/meal.service"
 import type { Meal } from "@/types/meal.type"
+import AddToCartButton from "./components/AddToCartButton"
 
 type MealDetailsPageProps = {
   params: Promise<{
@@ -65,7 +66,7 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
   const averageRating =
     reviewsList.length > 0
       ? reviewsList.reduce((sum, review) => sum + (Number.isFinite(review.rating) ? review.rating : 0), 0) /
-        reviewsList.length
+      reviewsList.length
       : null
   const hasValidPrice = typeof meal.price === "number" && Number.isFinite(meal.price)
   const priceLabel = hasValidPrice ? `$${meal.price!.toFixed(2)}` : "Price pending"
@@ -130,10 +131,7 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-4">
               <p className="text-sm text-muted-foreground">Meal details update automatically when API data changes.</p>
               <div className="flex items-center gap-2">
-                <Button variant="outline" disabled={availabilityState !== "Available" || !hasValidPrice}>
-                  Add to cart
-                </Button>
-                <Button disabled={availabilityState !== "Available" || !hasValidPrice}>Buy Now</Button>
+                <AddToCartButton availabilityState={availabilityState} hasValidPrice={hasValidPrice} id={id} />
               </div>
             </div>
           </div>
@@ -163,29 +161,26 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                seller?.isApproved
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${seller?.isApproved
                   ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
                   : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"
-              }`}
+                }`}
             >
               {seller?.isApproved ? "Approved Seller" : "Approval Pending"}
             </span>
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                seller?.isOpen
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${seller?.isOpen
                   ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
                   : "bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300"
-              }`}
+                }`}
             >
               {seller?.isOpen ? "Open Now" : "Closed"}
             </span>
             <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                seller?.isProfileCompleted
+              className={`rounded-full px-3 py-1 text-xs font-semibold ${seller?.isProfileCompleted
                   ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300"
                   : "bg-zinc-200 text-zinc-700 dark:bg-zinc-600/30 dark:text-zinc-200"
-              }`}
+                }`}
             >
               {seller?.isProfileCompleted ? "Profile Complete" : "Profile Incomplete"}
             </span>

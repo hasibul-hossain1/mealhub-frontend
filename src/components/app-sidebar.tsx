@@ -52,7 +52,7 @@ export function AppSidebar({ role, ...props }: AppSidebarProps) {
     { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { title: "Browse Meals", href: "/meals", icon: ShoppingBag },
     { title: "Restaurants", href: "/restaurants", icon: Store },
-    { title: "Cart", href: "/cart", icon: ShoppingCart },
+    { title: "Cart", href: "dashboard/cart", icon: ShoppingCart },
   ]
 
   const sellerMenus = [
