@@ -13,6 +13,7 @@ import {
 } from '../ui/dropdown-menu'
 import { LayoutDashboard, Loader2, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
+import { FaRegUserCircle } from 'react-icons/fa'
 
 type SessionUserView = {
   name?: string | null
@@ -112,6 +113,13 @@ function GetStarted() {
               <Link href="/dashboard">
                 <LayoutDashboard className="size-4" />
                 Dashboard
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard/profile">
+                <FaRegUserCircle className='size-4' />
+                My Profile
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

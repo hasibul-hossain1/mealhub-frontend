@@ -15,7 +15,7 @@ async function DashboardLayout({user,admin,seller}: {user: React.ReactNode,admin
 
   return (
     <div>
-        <Dashboard role={userInfo.role}>
+        <Dashboard role={userInfo.role!}>
             {userInfo.role === Role.ADMIN ? admin : userInfo.role === Role.SELLER ? seller : user}
         </Dashboard>
     </div>

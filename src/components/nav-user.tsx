@@ -32,6 +32,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { authClient } from "@/lib/auth-client"
+import { FaRegUserCircle } from "react-icons/fa"
 
 export function NavUser({
   user,
@@ -117,6 +118,12 @@ export function NavUser({
                 <Link href="/">
                   <House />
                   Go Back Home
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/dashboard/profile">
+                  <FaRegUserCircle />
+                  My Profile
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
