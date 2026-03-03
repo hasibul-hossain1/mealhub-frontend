@@ -1,5 +1,11 @@
 import { env } from "@/env";
-import type { Meal, MealCategory, MealDetailsResponse, MealsResponse } from "@/types/meal.type";
+import type {
+  Meal,
+  MealCategory,
+  MealDetailsResponse,
+  MealsResponse,
+} from "@/types/meal.type";
+import { cookies } from "next/headers";
 
 type MealParams = {
   page?: string;
@@ -11,6 +17,11 @@ type MealParams = {
   sortOrder?: "asc" | "desc";
   category?: string;
   available?: "true" | "false";
+};
+
+type CartMeal = {
+  mealId: string;
+  quantity: number;
 };
 
 export const mealService = {
@@ -33,9 +44,14 @@ export const mealService = {
   },
   getMealById: async (id: string) => {
     try {
-      const res = await fetch(`${env.BACKEND_URL}/meals/${id}`, { cache: "no-store" });
+      const res = await fetch(`${env.BACKEND_URL}/meals/${id}`, {
+        cache: "no-store",
+      });
       const payload = (await res.json()) as MealDetailsResponse | Meal;
-      const data = "data" in payload ? payload : ({ data: payload } as MealDetailsResponse);
+      const data =
+        "data" in payload
+          ? payload
+          : ({ data: payload } as MealDetailsResponse);
       return { data, error: null };
     } catch (error) {
       return { data: null as MealDetailsResponse | null, error };
@@ -43,9 +59,15 @@ export const mealService = {
   },
   getMealCategories: async () => {
     try {
-      const res = await fetch(`${env.BACKEND_URL}/meals/categories`, { cache: "no-store" });
+      const res = await fetch(`${env.BACKEND_URL}/meals/categories`, {
+        cache: "no-store",
+      });
       const payload = (await res.json()) as
-        | { data?: MealCategory[] | { data?: MealCategory[] | { data?: MealCategory[] } } }
+        | {
+            data?:
+              | MealCategory[]
+              | { data?: MealCategory[] | { data?: MealCategory[] } };
+          }
         | MealCategory[];
 
       const categories = Array.isArray(payload)
@@ -56,11 +78,52 @@ export const mealService = {
             ? payload.data.data
             : Array.isArray(payload?.data?.data?.data)
               ? payload.data.data.data
-            : [];
+              : [];
 
       return { data: categories, error: null };
     } catch (error) {
       return { data: [] as MealCategory[], error };
+    }
+  },
+  getCartMeals: async (cart: CartMeal[]) => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${env.BACKEND_URL}/meals/cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookieStore.toString(),
+        },
+        body: JSON.stringify({ items: cart }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to get cart items");
+      }
+
+      const data = await res.json();
+
+      return { data, error: null };
+    } catch (error: any) {
+      return { data: null, error };
+    }
+  },
+  addReview: async ({ id,payload }: { id: string,payload:{rating:number,comment:string} }) => {
+    const cookieStore = await cookies()
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/meals/${id}`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          Cookie:cookieStore.toString()
+        },
+        body:JSON.stringify(payload)
+      });
+      if (!res.ok) throw new Error("Failed to add review.");
+      const data = res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { error, data: null };
     }
   },
 };

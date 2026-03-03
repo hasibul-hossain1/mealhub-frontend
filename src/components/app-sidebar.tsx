@@ -12,6 +12,7 @@ import {
   ShoppingCart,
   Store,
   Users,
+  ListOrdered
 } from "lucide-react"
 
 import { Role } from "@/constant/role"
@@ -52,7 +53,8 @@ export function AppSidebar({ role, ...props }: AppSidebarProps) {
     { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { title: "Browse Meals", href: "/meals", icon: ShoppingBag },
     { title: "Restaurants", href: "/restaurants", icon: Store },
-    { title: "Cart", href: "dashboard/cart", icon: ShoppingCart },
+    {title:"My Orders", href:"/dashboard/my-orders", icon:ListOrdered},
+    { title: "Cart", href: "/dashboard/cart", icon: ShoppingCart },
   ]
 
   const sellerMenus = [

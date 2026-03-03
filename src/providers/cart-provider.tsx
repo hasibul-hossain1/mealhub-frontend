@@ -11,19 +11,44 @@ type CartState = {
 }
 
 type CartContextValue = {
-    cart: CartState
+    cart: CartState;
     addToCart: (item: CartMeal) => void
+    clearCart: () => void;
+    removeItemById:(id:string)=>void
+    increment: (id: string) => void
+    decrement: (id: string) => void
 }
 
 export const CartContext = createContext<CartContextValue | undefined>(undefined)
 
+const emptyCart: CartState = { items: [] }
+
+const normalizeCart = (value: unknown): CartState => {
+    if (
+        typeof value === "object" &&
+        value !== null &&
+        "items" in value &&
+        Array.isArray((value as CartState).items)
+    ) {
+        return value as CartState
+    }
+    return emptyCart
+}
+
 function CartProvider({ children }: { children: React.ReactNode }) {
-    const [cart, setCart] = useState(() => {
+    const [cart, setCart] = useState<CartState>(() => {
         if (typeof window === "undefined") {
-            return { items: [] }
+            return emptyCart
         }
         const stored = localStorage.getItem("cart")
-        return stored ? JSON.parse(stored) : { items: [] }
+        if (!stored) {
+            return emptyCart
+        }
+        try {
+            return normalizeCart(JSON.parse(stored))
+        } catch {
+            return emptyCart
+        }
     })
 
     useEffect(() => {
@@ -49,8 +74,41 @@ function CartProvider({ children }: { children: React.ReactNode }) {
         })
     }
 
+    const clearCart = () => {
+        setCart(emptyCart)
+    }
+
+    const removeItemById = (id: string) => {
+        setCart((prev) => ({
+            ...prev,
+            items: prev.items.filter((item) => item.mealId !== id),
+        }))
+    }
+
+    const increment = (id: string) => {
+        setCart((prev) => ({
+            ...prev,
+            items: prev.items.map((item) =>
+                item.mealId === id
+                    ? { ...item, quantity: item.quantity + 1 }
+                    : item
+            ),
+        }))
+    }
+
+    const decrement = (id: string) => {
+        setCart((prev) => ({
+            ...prev,
+            items: prev.items.map((item) =>
+               ( item.mealId === id && item.quantity > 1)
+                    ? { ...item, quantity: item.quantity - 1 }
+                    : item
+            ),
+        }))
+    }
+
     return (
-        <CartContext.Provider value={{ cart, addToCart }}>
+        <CartContext.Provider value={{ cart, addToCart, clearCart, removeItemById, increment, decrement }}>
             {children}
         </CartContext.Provider>
     )

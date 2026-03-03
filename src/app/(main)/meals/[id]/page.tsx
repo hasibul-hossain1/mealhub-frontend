@@ -6,6 +6,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { mealService } from "@/services/meal.service"
 import type { Meal } from "@/types/meal.type"
 import AddToCartButton from "./components/AddToCartButton"
+import { userService } from "@/services/user.service"
+import { Role } from "@/constant/role"
+import Review from "./components/Review"
+import { orderService } from "@/services/order.service"
+import { Star } from "lucide-react"
 
 type MealDetailsPageProps = {
   params: Promise<{
@@ -14,6 +19,13 @@ type MealDetailsPageProps = {
 }
 
 type ReviewItem = NonNullable<Meal["reviews"]>[number]
+type IsOrderedResponse = {
+  success: boolean
+  data?: {
+    isOrdered?: boolean
+  }
+  message?: string
+}
 
 async function MealDetailsPage({ params }: MealDetailsPageProps) {
   const { id } = await params
@@ -22,10 +34,29 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
   }
 
   const { data, error } = await mealService.getMealById(id)
+  const { user, error: userServiceError } = await userService.getSession()
+  const role = user?.role
   const meal = data?.data as Partial<Meal> | undefined
 
   if (error || !meal) {
     notFound()
+  }
+
+  let canWriteReview = false
+  let isOrderedErrorMessage: string | null = null
+
+  if (role === Role.CUSTOMER && !userServiceError) {
+    const { data: orderedData, error: orderedError } = await orderService.isOrdered({ mealId: id })
+
+    if (orderedError) {
+      isOrderedErrorMessage =
+        orderedError instanceof Error
+          ? orderedError.message
+          : "Could not verify your order history for this meal."
+    } else {
+      const orderedPayload = orderedData as IsOrderedResponse | null
+      canWriteReview = Boolean(orderedPayload?.data?.isOrdered)
+    }
   }
 
   const getText = (value: unknown, fallback = "Not Found") =>
@@ -205,7 +236,20 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
                       </Avatar>
                       <div>
                         <p className="text-sm font-semibold">{getReviewerName(review)}</p>
-                        <p className="text-xs text-muted-foreground">Rating: {formatRating(review.rating)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Rating:
+                          <span className="ml-1 inline-flex items-center gap-0.5 align-middle">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`h-3.5 w-3.5 ${i < Math.round(Number.isFinite(review.rating) ? review.rating : 0)
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "text-muted-foreground/40"
+                                  }`}
+                              />
+                            ))}
+                          </span>
+                        </p>
                       </div>
                     </div>
                     <p className="text-xs text-muted-foreground">{getDate(review.createdAt)}</p>
@@ -221,6 +265,27 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
           )}
         </article>
       </div>
+      {userServiceError && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+          We could not verify your session for review submission. Please sign in again if you want to leave a review.
+        </div>
+      )}
+
+      {role === Role.CUSTOMER && !userServiceError && isOrderedErrorMessage && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700">
+          {isOrderedErrorMessage}
+        </div>
+      )}
+
+      {role === Role.CUSTOMER && !userServiceError && !isOrderedErrorMessage && canWriteReview && (
+        <Review mealId={id} />
+      )}
+
+      {role === Role.CUSTOMER && !userServiceError && !isOrderedErrorMessage && !canWriteReview && (
+        <div className="rounded-xl border border-border bg-muted/30 p-4 text-sm text-muted-foreground">
+          You can review this meal after you place an order for it.
+        </div>
+      )}
     </section>
   )
 }

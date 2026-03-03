@@ -36,7 +36,6 @@ function AddToCartButton({ id, availabilityState, hasValidPrice }: { id: string,
             addToCart({ mealId: id, quantity: 1 })
             toast.custom((t) => (
                 <div className="bg-background border shadow-lg rounded-xl p-4 flex items-center justify-between gap-4 w-87.5">
-
                     <div className="flex flex-col">
                         <span className="font-medium">Item Added Successfully</span>
                         <span className="text-sm text-muted-foreground">
