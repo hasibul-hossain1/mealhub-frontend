@@ -226,7 +226,7 @@ async function MealDetailsPage({ params }: MealDetailsPageProps) {
 
           {reviewsList.length > 0 ? (
             <div className="space-y-3">
-              {reviewsList.slice(0, 4).map((review) => (
+              {reviewsList.map((review) => (
                 <div key={review.id} className="rounded-xl border border-border/80 bg-muted/30 p-3">
                   <div className="mb-2 flex items-start justify-between gap-3">
                     <div className="flex items-center gap-2">

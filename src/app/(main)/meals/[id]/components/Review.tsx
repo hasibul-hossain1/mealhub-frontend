@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Rating } from "@smastrom/react-rating"
 import "@smastrom/react-rating/style.css"
 import { type FormEvent, useState } from "react"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
 type ReviewPayload = {
@@ -17,6 +18,7 @@ type ReviewProps = {
 }
 
 function Review({ mealId }: ReviewProps) {
+  const router = useRouter()
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -80,6 +82,7 @@ function Review({ mealId }: ReviewProps) {
       setFormError(null)
       setRatingError(null)
       setCommentError(null)
+      router.refresh()
     } catch (submitError: unknown) {
       const message = getErrorMessage(submitError)
       setFormError(message)

@@ -120,7 +120,7 @@ export const mealService = {
         body:JSON.stringify(payload)
       });
       if (!res.ok) throw new Error("Failed to add review.");
-      const data = res.json();
+      const data = await res.json();
       return { data, error: null };
     } catch (error) {
       return { error, data: null };
