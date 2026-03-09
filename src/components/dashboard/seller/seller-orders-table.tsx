@@ -12,6 +12,10 @@ import {
 } from '@/components/ui/pagination'
 import { RxUpdate } from 'react-icons/rx'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { OrderStatus } from '@/constant/orderStatus'
+import { updateOrderStatus } from '@/action/seller.action'
+import { toast } from 'sonner'
 
 type SellerOrder = {
   id: string
@@ -24,14 +28,6 @@ type SellerOrder = {
   user: {
     name: string
   }
-}
-
-enum OrderStatus {
-  PENDING = 'PENDING',
-  CONFIRMED = 'CONFIRMED',
-  COOKING = 'COOKING',
-  DELIVERED = 'DELIVERED',
-  CANCELLED = 'CANCELLED',
 }
 
 type SellerOrdersTableProps = {
@@ -89,22 +85,35 @@ const formatStatus = (status: string) =>
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (character) => character.toUpperCase())
 
-const getStatusNextStep = (step:OrderStatus) => {
+const getStatusNextStep = (step: OrderStatus) => {
   switch (step) {
     case OrderStatus.PENDING:
-    return OrderStatus.CONFIRMED
+      return OrderStatus.CONFIRMED
     case OrderStatus.CONFIRMED:
-    return OrderStatus.COOKING
+      return OrderStatus.COOKING
     case OrderStatus.COOKING:
-    return OrderStatus.DELIVERED
+      return OrderStatus.DELIVERED
     default:
-    break;
+      return OrderStatus.PENDING
   }
 }
 
 function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const totalPages = Math.max(1, Math.ceil(orders.length / ITEMS_PER_PAGE))
+  const handleStatusUpdate = async ({ orderId, status }: { orderId: string, status: OrderStatus }) => {
+    const toastId = toast.loading('Updating order status...')
+    try {
+      const response = await updateOrderStatus({ orderId, status })
+      if (response.error) {
+        toast.error('Failed to update order status', { id: toastId })
+      } else {
+        toast.success(`Order status updated to ${status.toLowerCase()}`, { id: toastId })
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred', { id: toastId })
+    }
+  }
 
   const pageNumbers = useMemo(
     () =>
@@ -163,14 +172,33 @@ function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
                 <td className='max-w-56 px-4 py-3 text-muted-foreground'>{order.address}</td>
                 <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.createdAt)}</td>
                 <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.updatedAt)}</td>
-                <td className='px-4 py-3 text-muted-foreground'>
+                <td className="px-4 py-3 text-muted-foreground">
                   <DropdownMenu>
-                    <DropdownMenuTrigger className='cursor-pointer' disabled={order.status === OrderStatus.DELIVERED}>
-                      <RxUpdate />
-                    </DropdownMenuTrigger>
+                    {order.status === OrderStatus.DELIVERED ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span>
+                            <DropdownMenuTrigger disabled className="cursor-not-allowed opacity-50">
+                              <RxUpdate />
+                            </DropdownMenuTrigger>
+                          </span>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                          <p>Order already delivered</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <DropdownMenuTrigger className="cursor-pointer">
+                        <RxUpdate />
+                      </DropdownMenuTrigger>
+                    )}
+
                     <DropdownMenuContent>
-                      <DropdownMenuItem>{getStatusNextStep(order.status as OrderStatus)}</DropdownMenuItem>
-                      <DropdownMenuItem>Cancel</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate({ orderId: order.id, status: getStatusNextStep(order.status as OrderStatus) })}>
+                        {getStatusNextStep(order.status as OrderStatus)}
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleStatusUpdate({ orderId: order.id, status: OrderStatus.CANCELLED })}>Cancel</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </td>

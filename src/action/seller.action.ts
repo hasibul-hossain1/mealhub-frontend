@@ -7,6 +7,7 @@ import {
   type UpdateMealPayload,
 } from "@/services/seller.service"
 import { mealService } from "@/services/meal.service";
+import { OrderStatus } from "@/constant/orderStatus";
 
 export const createSeller = async (seller: { name: string; email: string; image?: string; password: string }) => {
   return await sellerService.createSeller(seller)
@@ -41,4 +42,11 @@ export const updateMeal = async (id: string, payload: UpdateMealPayload) => {
   } catch (error) {
     return { data: null, error }
   }
+}
+
+export const updateOrderStatus = async ({orderId,status}:{orderId:string,status:OrderStatus}) => {
+  const response = await sellerService.updateOrderStatus({orderId,status})
+  revalidatePath("/seller-dashboard/orders")
+  revalidatePath("/seller-dashboard")
+  return response
 }
