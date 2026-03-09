@@ -31,6 +31,8 @@ import {
 } from "@/components/ui/sidebar"
 import SidebarLogo from "./dashboard/sidebar-logo"
 import { authClient } from "@/lib/auth-client"
+import { GiHotMeal } from "react-icons/gi"
+import { MdOutlineReceiptLong } from "react-icons/md"
 
 type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
   role: string
@@ -59,8 +61,9 @@ export function AppSidebar({ role, ...props }: AppSidebarProps) {
 
   const sellerMenus = [
     { title: "Seller Dashboard", href: "/seller-dashboard", icon: LayoutDashboard },
-    { title: "My Meals", href: "/meals", icon: ShoppingBasket },
-    { title: "Settings", href: "/dashboard/settings", icon: Settings },
+    { title: "Add Meal", href: "/seller-dashboard/add-meal", icon: GiHotMeal },
+    { title: "My Meals", href: "/seller-dashboard/my-meals", icon: ShoppingBasket },
+    { title: "Order Management", href: "/seller-dashboard/orders", icon: MdOutlineReceiptLong },
   ]
 
   const adminMenus = [

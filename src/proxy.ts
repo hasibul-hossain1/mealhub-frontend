@@ -13,6 +13,8 @@ export async function proxy(req: NextRequest) {
     pathname.startsWith("/admin-dashboard") ||
     pathname.startsWith("/seller-dashboard");
 
+    const isProfileRoute = pathname === "/dashboard/profile";
+
   // 🚫 Not logged in → block dashboard
   if (isDashboardPath && !isAuthenticated) {
     return NextResponse.redirect(new URL("/signin", req.url));
@@ -39,7 +41,7 @@ export async function proxy(req: NextRequest) {
     }
 
     // Base user dashboard protection
-    if (pathname === "/dashboard" && role !== Role.CUSTOMER) {
+    if (pathname.startsWith("/dashboard") && role !== Role.CUSTOMER) {
       if (role === Role.ADMIN) {
         return NextResponse.redirect(new URL("/admin-dashboard", req.url));
       }
@@ -59,9 +61,13 @@ export async function proxy(req: NextRequest) {
     }
   }
 
+  if (role === Role.SELLER && isProfileRoute) {
+    return NextResponse.redirect(new URL("/seller-dashboard/profile", req.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/signin", "/signup", "/dashboard", "/admin-dashboard/:path*", "/seller-dashboard/:path*"],
+  matcher: ["/signin", "/signup", "/dashboard/:path*", "/admin-dashboard/:path*", "/seller-dashboard/:path*"],
 };

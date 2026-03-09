@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "sonner";
 import CartProvider from "@/providers/cart-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const openSans = Open_Sans({
   variable: "--font-open-sans",
@@ -30,7 +31,9 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <CartProvider>
-            {children}
+            <TooltipProvider>
+              {children}
+            </TooltipProvider>
           </CartProvider>
         </ThemeProvider>
         <Toaster richColors position="top-center" />
