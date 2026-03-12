@@ -24,6 +24,11 @@ type CartMeal = {
   quantity: number;
 };
 
+export type CategoryPayload = {
+  name: string;
+  imageUrl: string;
+}
+
 export const mealService = {
   getMeals: async (params?: MealParams) => {
     try {
@@ -120,6 +125,41 @@ export const mealService = {
         body:JSON.stringify(payload)
       });
       if (!res.ok) throw new Error("Failed to add review.");
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { error, data: null };
+    }
+  },
+  createCategory: async (payload:CategoryPayload) => {
+    const cookieStore = await cookies()
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/admin/create-category`,{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json",
+          Cookie:cookieStore.toString()
+        },
+        body:JSON.stringify(payload)
+      })
+      if (!res.ok) throw new Error("Failed to create category.");
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return {data:null,error}
+    }
+  },
+  deleteCategories: async ({categoryId}:{categoryId:string}) => {
+    const cookieStore = await cookies()
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/admin/delete-category/${categoryId}`,{
+        method:"DELETE",
+        headers:{
+          "Content-Type":"application/json",
+          Cookie:cookieStore.toString()
+        }
+      });
+      if (!res.ok) throw new Error("Failed to delete category.");
       const data = await res.json();
       return { data, error: null };
     } catch (error) {

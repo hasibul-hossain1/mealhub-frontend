@@ -1,3 +1,4 @@
+// middleware/proxy.ts
 import { NextRequest, NextResponse } from "next/server";
 import { userService } from "./services/user.service";
 import { Role } from "@/constant/role";
@@ -8,19 +9,30 @@ export async function proxy(req: NextRequest) {
 
   const isAuthenticated = Boolean(user && session);
   const role = user?.role;
+  const isBanned = user?.isActive === false;
+
+  if (isBanned) {
+    return NextResponse.redirect(new URL("/banned", req.url));
+  }
+
+  if (pathname.startsWith("/banned") && isBanned) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  // ✅ Dashboard paths
   const isDashboardPath =
-    pathname === "/dashboard" ||
+    pathname.startsWith("/dashboard") ||
     pathname.startsWith("/admin-dashboard") ||
     pathname.startsWith("/seller-dashboard");
 
-    const isProfileRoute = pathname === "/dashboard/profile";
+  const isProfileRoute = pathname.startsWith("/dashboard/profile");
 
-  // 🚫 Not logged in → block dashboard
+  // 🚫 Not logged in → block dashboard access
   if (isDashboardPath && !isAuthenticated) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
-  // 🚫 Logged in → block signin
+  // 🚫 Logged in → block signin/signup pages
   if (
     (pathname.startsWith("/signin") || pathname.startsWith("/signup")) &&
     isAuthenticated
@@ -28,8 +40,13 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
-  // 🔐 Role based dashboard routing
-  if (isDashboardPath) {
+  // Authenticated but trying to access seller signup → block
+  if (isAuthenticated && pathname.startsWith("/seller-signup")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  // 🔐 Role-based dashboard routing
+  if (isDashboardPath && isAuthenticated) {
     // Admin route protection
     if (pathname.startsWith("/admin-dashboard") && role !== Role.ADMIN) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
@@ -51,16 +68,17 @@ export async function proxy(req: NextRequest) {
       }
     }
 
-    // Optional redirect from role dashboards to their own route
-    if (role === Role.ADMIN && pathname === "/dashboard") {
+    // Optional: redirect from base dashboard to role-specific dashboards
+    if (role === Role.ADMIN && pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/admin-dashboard", req.url));
     }
 
-    if (role === Role.SELLER && pathname === "/dashboard") {
+    if (role === Role.SELLER && pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/seller-dashboard", req.url));
     }
   }
 
+  // Seller profile redirect
   if (role === Role.SELLER && isProfileRoute) {
     return NextResponse.redirect(new URL("/seller-dashboard/profile", req.url));
   }
@@ -68,6 +86,16 @@ export async function proxy(req: NextRequest) {
   return NextResponse.next();
 }
 
+// Middleware matcher
 export const config = {
-  matcher: ["/signin", "/signup", "/dashboard/:path*", "/admin-dashboard/:path*", "/seller-dashboard/:path*"],
+  matcher: [
+    "/",
+    "/meals",
+    "/signin",
+    "/signup",
+    "/seller-signup",
+    "/dashboard/:path*",
+    "/admin-dashboard/:path*",
+    "/seller-dashboard/:path*",
+  ],
 };

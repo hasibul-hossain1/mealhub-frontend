@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 function Signup() {
   const [name, setName] = useState("")
@@ -164,6 +165,7 @@ function Signup() {
             {isSubmitting ? "Signing up..." : "Sign up"}
           </Button>
         </form>
+       <p className="text-sm text-center font-medium mt-2">if you want be a seller <Link href={'/seller-signup'} className="text-red-500">click here</Link></p>
       </div>
     </div>
   )

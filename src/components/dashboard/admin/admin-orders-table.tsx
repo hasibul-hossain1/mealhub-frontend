@@ -10,14 +10,19 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { RxUpdate } from 'react-icons/rx'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { OrderStatus } from '@/constant/orderStatus'
-import { updateOrderStatus } from '@/action/seller.action'
-import { toast } from 'sonner'
 
-type SellerOrder = {
+export type AdminOrderItem = {
+  quantity: number
+  meal?: {
+    foodName?: string | null
+    seller?: {
+      restaurantName?: string | null
+    }
+  }
+}
+
+export type AdminOrder = {
   id: string
   userId: string
   status: string
@@ -25,16 +30,18 @@ type SellerOrder = {
   createdAt: string
   updatedAt: string
   address: string
-  user: {
-    name: string
+  user?: {
+    name?: string | null
+    email?: string | null
   }
+  orderItems?: AdminOrderItem[]
 }
 
-type SellerOrdersTableProps = {
-  orders: SellerOrder[]
+type AdminOrdersTableProps = {
+  orders: AdminOrder[]
 }
 
-const ITEMS_PER_PAGE = 6
+const ITEMS_PER_PAGE = 7
 
 const currency = new Intl.NumberFormat('en-BD', {
   style: 'currency',
@@ -85,36 +92,43 @@ const formatStatus = (status: string) =>
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (character) => character.toUpperCase())
 
-const getStatusNextStep = (step: OrderStatus) => {
-  switch (step) {
-    case OrderStatus.PENDING:
-      return OrderStatus.CONFIRMED
-    case OrderStatus.CONFIRMED:
-      return OrderStatus.COOKING
-    case OrderStatus.COOKING:
-      return OrderStatus.DELIVERED
-    default:
-      return OrderStatus.PENDING
+const getUniqueLabel = (values: (string | null | undefined)[], visibleCount = 2) => {
+  const unique = Array.from(new Set(values.filter((value): value is string => Boolean(value))))
+
+  if (unique.length === 0) {
+    return 'N/A'
+  }
+
+  const visible = unique.slice(0, visibleCount)
+  const remaining = unique.length - visible.length
+
+  return remaining > 0 ? `${visible.join(', ')} +${remaining} more` : visible.join(', ')
+}
+
+const getItemsMeta = (order: AdminOrder) => {
+  const items = Array.isArray(order.orderItems) ? order.orderItems : []
+  const totalQuantity = items.reduce(
+    (sum, item) => sum + (typeof item.quantity === 'number' ? item.quantity : 0),
+    0,
+  )
+  const totalItems = totalQuantity || items.length
+  const itemNames = items.map((item) => item.meal?.foodName ?? null)
+
+  return {
+    totalItems,
+    summary: getUniqueLabel(itemNames),
   }
 }
 
-function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
+const getRestaurantSummary = (order: AdminOrder) => {
+  const items = Array.isArray(order.orderItems) ? order.orderItems : []
+  const names = items.map((item) => item.meal?.seller?.restaurantName ?? null)
+  return getUniqueLabel(names)
+}
+
+function AdminOrdersTable({ orders }: AdminOrdersTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const totalPages = Math.max(1, Math.ceil(orders.length / ITEMS_PER_PAGE))
-  const handleStatusUpdate = async ({ orderId, status }: { orderId: string, status: OrderStatus }) => {
-    const toastId = toast.loading('Updating order status...')
-    try {
-      const response = await updateOrderStatus({ orderId, status })
-      if (response.error) {
-        toast.error('Failed to update order status', { id: toastId })
-      } else {
-        toast.success(`Order status updated to ${status.toLowerCase()}`, { id: toastId })
-      }
-    } catch (error) {
-      toast.error('An unexpected error occurred', { id: toastId })
-      throw error
-    }
-  }
 
   const pageNumbers = useMemo(
     () =>
@@ -142,69 +156,55 @@ function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
   return (
     <div className='rounded-md border bg-background lg:p-4'>
       <div className='overflow-x-auto'>
-        <table className='w-full min-w-230 text-sm'>
+        <table className='w-full min-w-265 text-sm'>
           <thead className='bg-muted/50'>
             <tr className='border-b text-left'>
               <th className='px-4 py-3 font-medium'>Order ID</th>
-              <th className='px-4 py-3 font-medium'>Customer Name</th>
-              <th className='px-4 py-3 font-medium'>Customer ID</th>
+              <th className='px-4 py-3 font-medium'>Customer</th>
               <th className='px-4 py-3 font-medium'>Status</th>
               <th className='px-4 py-3 font-medium'>Total</th>
+              <th className='px-4 py-3 font-medium'>Items</th>
+              <th className='px-4 py-3 font-medium'>Restaurant</th>
               <th className='px-4 py-3 font-medium'>Address</th>
               <th className='px-4 py-3 font-medium'>Created</th>
               <th className='px-4 py-3 font-medium'>Updated</th>
-              <th className='px-4 py-3 font-medium'>Update Status</th>
             </tr>
           </thead>
           <tbody>
-            {paginatedOrders.map((order) => (
-              <tr key={order.id} className='border-b align-top'>
-                <td className='px-4 py-3 font-medium text-foreground'>#{order.id.slice(0, 8)}</td>
-                <td className='px-4 py-3 text-muted-foreground'>{order.user.name}</td>
-                <td className='px-4 py-3 text-muted-foreground'>{order.userId.slice(0, 10)}...</td>
-                <td className='px-4 py-3'>
-                  <span
-                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusClassName(order.status)}`}
-                  >
-                    {formatStatus(order.status)}
-                  </span>
-                </td>
-                <td className='px-4 py-3 font-medium'>{currency.format(order.totalPrice)}</td>
-                <td className='max-w-56 px-4 py-3 text-muted-foreground'>{order.address}</td>
-                <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.createdAt)}</td>
-                <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.updatedAt)}</td>
-                <td className="px-4 py-3 text-muted-foreground">
-                  <DropdownMenu>
-                    {order.status === OrderStatus.DELIVERED ? (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span>
-                            <DropdownMenuTrigger disabled className="cursor-not-allowed opacity-50">
-                              <RxUpdate />
-                            </DropdownMenuTrigger>
-                          </span>
-                        </TooltipTrigger>
-
-                        <TooltipContent>
-                          <p>Order already delivered</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    ) : (
-                      <DropdownMenuTrigger className="cursor-pointer">
-                        <RxUpdate />
-                      </DropdownMenuTrigger>
-                    )}
-
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate({ orderId: order.id, status: getStatusNextStep(order.status as OrderStatus) })}>
-                        {getStatusNextStep(order.status as OrderStatus)}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusUpdate({ orderId: order.id, status: OrderStatus.CANCELLED })}>Cancel</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </td>
-              </tr>
-            ))}
+            {paginatedOrders.map((order) => {
+              const itemsMeta = getItemsMeta(order)
+              return (
+                <tr key={order.id} className='border-b align-top'>
+                  <td className='px-4 py-3 font-medium text-foreground'>#{order.id.slice(0, 8)}</td>
+                  <td className='px-4 py-3'>
+                    <div className='space-y-1'>
+                      <p className='font-medium text-foreground'>{order.user?.name ?? 'Unknown customer'}</p>
+                      <p className='text-xs text-muted-foreground'>{order.user?.email ?? 'Email not available'}</p>
+                    </div>
+                  </td>
+                  <td className='px-4 py-3'>
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusClassName(order.status)}`}
+                    >
+                      {formatStatus(order.status)}
+                    </span>
+                  </td>
+                  <td className='px-4 py-3 font-medium'>{currency.format(order.totalPrice)}</td>
+                  <td className='px-4 py-3'>
+                    <div className='space-y-1'>
+                      <p className='font-medium text-foreground'>
+                        {itemsMeta.totalItems} item{itemsMeta.totalItems === 1 ? '' : 's'}
+                      </p>
+                      <p className='text-xs text-muted-foreground line-clamp-2'>{itemsMeta.summary}</p>
+                    </div>
+                  </td>
+                  <td className='max-w-56 px-4 py-3 text-muted-foreground'>{getRestaurantSummary(order)}</td>
+                  <td className='max-w-56 px-4 py-3 text-muted-foreground'>{order.address}</td>
+                  <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.createdAt)}</td>
+                  <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.updatedAt)}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
@@ -265,4 +265,4 @@ function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
   )
 }
 
-export default SellerOrdersTable
+export default AdminOrdersTable

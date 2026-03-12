@@ -91,4 +91,22 @@ export const orderService = {
       return { data: null, error };
     }
   },
+  getAllOrder: async () => {
+    const cookieStore = await cookies();
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/admin/all-meal`, {
+        headers:{
+          Cookie: cookieStore.toString(),
+          "Content-Type":"application/json"
+        }
+      })
+      if (!res.ok) {
+        throw new Error("Failed to get all orders")
+      }
+      const data = await res.json()
+      return {data,error:null}
+    } catch (error) {
+      return {data:null,error}
+    }
+  }
 };

@@ -1,9 +1,10 @@
+import { OrderStatus } from "@/constant/orderStatus";
 import { env } from "@/env";
 import { cookies } from "next/headers";
 
 export type AddMealPayload = {
   categoryId: string;
-  foodName: string;
+  name: string;
   description?: string;
   price: number;
   imageUrl: string;
@@ -134,4 +135,26 @@ export const sellerService = {
       return { data: null, error };
     }
   },
+  updateOrderStatus:async ({orderId,status}:{orderId:string,status:OrderStatus}) => {
+    try {
+      const cookieStore = await cookies()
+       const res = await fetch(`${env.BACKEND_URL}/seller/orders/${orderId}`,{
+      method:"PATCH",
+      headers:{
+        "Content-Type":"application/json",
+        Cookie:cookieStore.toString()
+      },
+      body:JSON.stringify({status})
+    })
+    if (!res.ok) {
+      throw new Error("Order update failed")
+    }
+    const data = await res.json()
+    return {error:null,data}
+      
+    } catch (error) {
+      return {data:null,error}
+    }
+   
+  }
 };

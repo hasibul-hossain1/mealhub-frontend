@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { createSeller } from "@/action/seller.action"
+import Link from "next/link"
 
 function SellerSignUp() {
   const [name, setName] = useState("")
@@ -23,15 +24,23 @@ function SellerSignUp() {
     const toastId = toast.loading("Creating seller account...")
 
     try {
-      const { error } = await createSeller({name,email,image,password})
+      const { error } = await createSeller({ name, email, image, password })
 
       if (error) {
         return toast.error("Could not create account.", { id: toastId })
       }
-      toast.success("Seller Account created. We sent a verification email. Please verify your account.", { id: toastId })
+
+      toast.success(
+        "Your seller account has been created. Please verify your email to start selling on MealHub.",
+        { id: toastId }
+      )
+
       router.push("/signin")
     } catch (error: any) {
-      toast.error(error?.message || "An unexpected error occurred while signing up.", { id: toastId })
+      toast.error(
+        error?.message || "An unexpected error occurred while signing up.",
+        { id: toastId }
+      )
     } finally {
       setIsSubmitting(false)
     }
@@ -39,6 +48,7 @@ function SellerSignUp() {
 
   return (
     <div className="grid w-full overflow-hidden rounded-3xl border border-border/60 bg-card/95 shadow-xl backdrop-blur sm:max-w-4xl sm:grid-cols-2">
+      {/* Left Marketing / Info Section */}
       <div className="relative hidden overflow-hidden border-r border-border/60 bg-[radial-gradient(circle_at_top,hsl(var(--primary)/0.22),transparent_58%),linear-gradient(120deg,hsl(var(--accent)/0.3),hsl(var(--background)))] p-8 sm:block">
         <div className="absolute -left-16 top-6 h-48 w-48 rounded-full bg-primary/20 blur-3xl" />
         <div className="absolute bottom-4 right-3 h-44 w-44 rounded-full bg-accent/35 blur-3xl" />
@@ -49,10 +59,10 @@ function SellerSignUp() {
               MealHub
             </p>
             <h2 className="mt-4 text-3xl font-extrabold leading-tight text-foreground">
-              Create your account and start ordering faster.
+              Start selling your meals on MealHub
             </h2>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              Save addresses, track deliveries, and keep your favorite meals in one place.
+              Create your seller account to manage your menu, receive orders, and grow your food business.
             </p>
           </div>
 
@@ -60,35 +70,44 @@ function SellerSignUp() {
             <div className="rounded-xl border border-border/70 bg-card/80 p-3">
               <p className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <UserPlus className="size-4 text-primary" />
-                Quick account setup
+                Quick seller onboarding
               </p>
             </div>
             <div className="rounded-xl border border-border/70 bg-card/80 p-3">
               <p className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <Sparkles className="size-4 text-primary" />
-                Personalized meal recommendations
+                Manage your menu & orders
               </p>
             </div>
             <div className="rounded-xl border border-border/70 bg-card/80 p-3">
               <p className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <ShieldCheck className="size-4 text-primary" />
-                Secure authentication flow
+                Secure seller dashboard
               </p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Right Form Section */}
       <div className="relative p-6 sm:p-8">
         <div className="mb-7">
-          <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Create account</p>
-          <h1 className="mt-2 text-2xl font-bold text-foreground">Sign up as a Seller</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Enter your details to create a new MealHub account.</p>
+          <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">
+            Seller registration
+          </p>
+          <h1 className="mt-2 text-2xl font-bold text-foreground">
+            Create your seller account
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Join MealHub and start selling your delicious meals to customers.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
           <div className="space-y-2">
-            <label htmlFor="name" className="text-sm font-medium text-foreground">Name</label>
+            <label htmlFor="name" className="text-sm font-medium text-foreground">
+              Name
+            </label>
             <Input
               id="name"
               type="text"
@@ -102,7 +121,9 @@ function SellerSignUp() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
+            <label htmlFor="email" className="text-sm font-medium text-foreground">
+              Email
+            </label>
             <Input
               id="email"
               type="email"
@@ -116,7 +137,9 @@ function SellerSignUp() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="image" className="text-sm font-medium text-foreground">Image URL</label>
+            <label htmlFor="image" className="text-sm font-medium text-foreground">
+              Image URL
+            </label>
             <Input
               id="image"
               type="url"
@@ -129,7 +152,9 @@ function SellerSignUp() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="password" className="text-sm font-medium text-foreground">Password</label>
+            <label htmlFor="password" className="text-sm font-medium text-foreground">
+              Password
+            </label>
             <div className="relative">
               <Input
                 id="password"
@@ -145,7 +170,7 @@ function SellerSignUp() {
                 type="button"
                 variant="ghost"
                 size="icon-sm"
-                onClick={() => setShowPassword((previous) => !previous)}
+                onClick={() => setShowPassword((prev) => !prev)}
                 className="absolute top-1/2 right-1 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
@@ -154,10 +179,15 @@ function SellerSignUp() {
             </div>
           </div>
 
-          <Button type="submit" className="mt-2 h-11 w-full font-semibold" disabled={isSubmitting}>
-            {isSubmitting ? "Signing up..." : "Sign up"}
+          <Button
+            type="submit"
+            className="mt-2 h-11 w-full font-semibold"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating Account..." : "Create Seller Account"}
           </Button>
         </form>
+        <p className="text-sm text-center font-medium mt-2">if you want to order food <Link href={'/signup'} className="text-red-500">click here</Link></p>
       </div>
     </div>
   )

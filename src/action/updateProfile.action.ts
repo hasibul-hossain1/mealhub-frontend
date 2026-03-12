@@ -1,5 +1,6 @@
 "use server";
 import { env } from "@/env";
+import { userService } from "@/services/user.service";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 
@@ -36,3 +37,15 @@ export async function updateProfileAction(formData: FormData) {
   revalidatePath("/dashboard/profile"); // <-- this triggers Server Component refresh
   return true;
 }
+
+export const updateUserStatus = async ({
+  id,
+  status,
+}: {
+  id: string;
+  status: boolean;
+}) => {
+  const data = await userService.updateUserStatus({ id, status });
+  revalidatePath("/admin-dashboard/users");
+  return data;
+};

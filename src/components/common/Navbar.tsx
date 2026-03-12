@@ -1,4 +1,3 @@
-import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
@@ -65,7 +64,7 @@ async function Navbar() {
                 </div>
               </SheetContent>
             </Sheet>
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
               <Image
                 src="/logos/logo.png"
                 alt="MealHub Logo"

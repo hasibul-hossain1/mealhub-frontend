@@ -1,3 +1,4 @@
+import { env } from "@/env";
 import { cookies } from "next/headers";
 
 type SessionUser = {
@@ -83,6 +84,43 @@ export const userService = {
             ? error.message
             : "An error occurred while fetching the session.",
       };
+    }
+  },
+  getAllUser: async () => {
+    const cookieStore = await cookies();
+    try {
+      const res = await fetch(`${env.BACKEND_URL}/user`, {
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to get users");
+      }
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error };
+    }
+  },
+  updateUserStatus: async ({ id, status }: { id: string; status: boolean }) => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${env.BACKEND_URL}/user/${id}`, {
+        method: "PATCH",
+        headers: {
+          Cookie: cookieStore.toString(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to update user status");
+      }
+      const data = await res.json();
+      return { data, error: null };
+    } catch (error) {
+      return { data: null, error };
     }
   },
 };

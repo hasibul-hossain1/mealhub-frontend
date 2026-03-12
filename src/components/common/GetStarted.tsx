@@ -14,6 +14,7 @@ import {
 import { LayoutDashboard, Loader2, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 import { FaRegUserCircle } from 'react-icons/fa'
+import { useRouter } from 'next/navigation'
 
 type SessionUserView = {
   name?: string | null
@@ -26,6 +27,7 @@ function GetStarted() {
   const { data, error, isPending, isRefetching } = authClient.useSession()
   const user = data?.user as SessionUserView | undefined
   const roleLabel = user?.role ?? "USER"
+  const router = useRouter()
 
   const initials = user?.name
     ? user.name
@@ -45,6 +47,7 @@ function GetStarted() {
         return
       }
       toast.success("Signed out successfully.", { id: toastId })
+      router.push("/signin")
     } catch (logoutError: any) {
       toast.error(logoutError?.message || "Failed to sign out.", { id: toastId })
     }

@@ -68,9 +68,9 @@ export function AppSidebar({ role, ...props }: AppSidebarProps) {
 
   const adminMenus = [
     { title: "Admin Dashboard", href: "/admin-dashboard", icon: LayoutDashboard },
-    { title: "Users", href: "/dashboard/users", icon: Users },
-    { title: "Restaurants", href: "/restaurants", icon: Store },
-    { title: "Settings", href: "/dashboard/settings", icon: Settings },
+    { title: "Users", href: "/admin-dashboard/users", icon: Users },
+    { title: "View All Orders", href: "/admin-dashboard/all-orders", icon: Store },
+    { title: "Manage Categories", href: "/admin-dashboard/categories", icon: Settings },
   ]
 
   const menus = resolvedRole === Role.ADMIN ? adminMenus : resolvedRole === Role.SELLER ? sellerMenus : userMenus
