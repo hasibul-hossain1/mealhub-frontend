@@ -31,7 +31,7 @@ function SellerSignUp() {
       }
 
       toast.success(
-        "Your seller account has been created. Please verify your email to start selling on MealHub.",
+        "Your seller account has been created. Please verify your email to start selling on Tyme2eat.",
         { id: toastId }
       )
 
@@ -56,10 +56,10 @@ function SellerSignUp() {
         <div className="relative z-10 flex h-full flex-col justify-between">
           <div>
             <p className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
-              MealHub
+              Tyme2eat
             </p>
             <h2 className="mt-4 text-3xl font-extrabold leading-tight text-foreground">
-              Start selling your meals on MealHub
+              Start selling your meals on Tyme2eat
             </h2>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
               Create your seller account to manage your menu, receive orders, and grow your food business.
@@ -99,7 +99,7 @@ function SellerSignUp() {
             Create your seller account
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Join MealHub and start selling your delicious meals to customers.
+            Join Tyme2eat and start selling your delicious meals to customers.
           </p>
         </div>
 

@@ -35,7 +35,7 @@ function page() {
         <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Account Status</p>
         <h1 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">Your Account Has Been Restricted</h1>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-          Access to MealHub has been temporarily blocked for this account. If you believe this is an error, our team can
+          Access to Tyme2eat has been temporarily blocked for this account. If you believe this is an error, our team can
           review your case.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">
@@ -43,7 +43,7 @@ function page() {
             <Link href="/contact">Contact Support</Link>
           </Button>
           <Button asChild variant="outline">
-            <a href="mailto:support@mealhub.demo">Email Support</a>
+            <a href="mailto:support@tyme2eat.demo">Email Support</a>
           </Button>
         </div>
       </div>

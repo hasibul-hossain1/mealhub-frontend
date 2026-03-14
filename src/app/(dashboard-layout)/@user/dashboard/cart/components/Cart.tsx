@@ -140,7 +140,7 @@ function Cart() {
           <header className="rounded-3xl border border-border/60 bg-background/80 p-6 shadow-sm backdrop-blur">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">MealHub Cart</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Tyme2eat Cart</p>
                 <h1 className="mt-2 text-3xl font-black text-foreground sm:text-4xl">Your cart is almost ready</h1>
                 <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
                   Review your meals, tweak portions, and checkout in seconds. Your items are reserved for
@@ -312,7 +312,7 @@ function Cart() {
                   </p>
                 </div>
                 <Button onClick={handleOrder} className="mt-5 w-full">Proceed to checkout</Button>
-                <p className="mt-3 text-xs text-muted-foreground">By placing your order, you agree to MealHub policies.</p>
+                <p className="mt-3 text-xs text-muted-foreground">By placing your order, you agree to Tyme2eat policies.</p>
               </div>
 
 

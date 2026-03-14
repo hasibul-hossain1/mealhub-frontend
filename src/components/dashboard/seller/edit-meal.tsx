@@ -175,7 +175,7 @@ function EditMeal({ meal }: EditMealProps) {
     }
 
     const categoryId = formState.categoryId.trim()
-    const foodName = formState.name.trim()
+    const name = formState.name.trim()
     const description = formState.description.trim()
     const imageUrl = formState.imageUrl.trim()
     const price = Number(formState.price)
@@ -186,7 +186,7 @@ function EditMeal({ meal }: EditMealProps) {
     try {
       const { error } = await updateMeal(meal.id, {
         categoryId,
-        foodName,
+        name,
         description: description || undefined,
         price,
         imageUrl,

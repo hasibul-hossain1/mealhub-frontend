@@ -211,7 +211,7 @@ async function MealsPage({ searchParams }: MealsPageProps) {
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 rounded-2xl border border-border/70 bg-linear-to-r from-orange-50 via-amber-50 to-emerald-50 p-6 dark:from-orange-950/40 dark:via-amber-950/30 dark:to-emerald-950/30">
-        <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">MealHub Menu</p>
+        <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Tyme2eat Menu</p>
         <h1 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">Explore All Meals</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
           Browse meals, then narrow your list by category, price range and availability.

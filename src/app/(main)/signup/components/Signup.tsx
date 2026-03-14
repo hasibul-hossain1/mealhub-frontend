@@ -53,7 +53,7 @@ function Signup() {
         <div className="relative z-10 flex h-full flex-col justify-between">
           <div>
             <p className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
-              MealHub
+              Tyme2eat
             </p>
             <h2 className="mt-4 text-3xl font-extrabold leading-tight text-foreground">
               Create your account and start ordering faster.
@@ -90,7 +90,7 @@ function Signup() {
         <div className="mb-7">
           <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Create account</p>
           <h1 className="mt-2 text-2xl font-bold text-foreground">Sign up</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Enter your details to create a new MealHub account.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Enter your details to create a new Tyme2eat account.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">

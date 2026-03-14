@@ -51,7 +51,7 @@ function page() {
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 rounded-2xl border border-border/70 bg-linear-to-r from-emerald-50 via-sky-50 to-orange-50 p-6 dark:from-emerald-950/30 dark:via-sky-950/30 dark:to-orange-950/30">
         <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Careers</p>
-        <h1 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">Join the MealHub Team</h1>
+        <h1 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">Join the Tyme2eat Team</h1>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
           We are building a reliable food platform for customers and restaurants. Explore open roles and help us create
           a better ordering experience every day.

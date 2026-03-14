@@ -51,7 +51,7 @@ function Signin() {
         <div className="relative z-10 flex h-full flex-col justify-between">
           <div>
             <p className="inline-flex rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
-              MealHub
+              Tyme2eat
             </p>
             <h2 className="mt-4 text-3xl font-extrabold leading-tight text-foreground">
               Welcome back to your food dashboard.

@@ -22,7 +22,7 @@ function page() {
           <div className="mt-5 space-y-3 text-sm">
             <div className="rounded-xl border border-border/80 bg-muted/30 p-3">
               <p className="text-xs font-semibold text-muted-foreground">Email</p>
-              <p className="mt-1 font-medium">support@mealhub.demo</p>
+              <p className="mt-1 font-medium">support@tyme2eat.demo</p>
             </div>
             <div className="rounded-xl border border-border/80 bg-muted/30 p-3">
               <p className="text-xs font-semibold text-muted-foreground">Phone</p>

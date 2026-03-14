@@ -24,7 +24,7 @@ function WhyChooseUs() {
       <div className="rounded-3xl border border-border bg-muted/30 p-6 motion-safe:animate-in motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 sm:p-8">
         <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
           <div>
-            <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Why MealHub</p>
+            <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">Why Tyme2eat</p>
             <h2 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">Built for Daily Cravings</h2>
             <p className="mt-3 max-w-xl text-sm text-muted-foreground">
               From lunch rush to late-night orders, we keep food discovery and delivery simple, fast, and dependable.

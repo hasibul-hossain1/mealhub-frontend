@@ -27,10 +27,10 @@ function page() {
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div className="mb-8 rounded-2xl border border-border/70 bg-linear-to-r from-orange-50 via-amber-50 to-emerald-50 p-6 dark:from-orange-950/40 dark:via-amber-950/30 dark:to-emerald-950/30">
-        <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">About MealHub</p>
+        <p className="text-xs font-semibold tracking-[0.18em] text-primary uppercase">About Tyme2eat</p>
         <h1 className="mt-2 text-2xl font-extrabold text-foreground sm:text-3xl">Making Food Ordering Simple and Reliable</h1>
         <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-          MealHub connects customers with trusted restaurants, helping people discover great food and get it delivered
+          Tyme2eat connects customers with trusted restaurants, helping people discover great food and get it delivered
           quickly. We are building a platform focused on quality meals, smooth ordering, and dependable service.
         </p>
         <div className="mt-5 flex flex-wrap gap-2">

@@ -67,14 +67,14 @@ async function Navbar() {
             <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
               <Image
                 src="/logos/logo.png"
-                alt="MealHub Logo"
+                alt="Tyme2eat Logo"
                 width={40}
                 height={40}
                 className="h-10 w-10"
               />
               <Image
                 src="/logos/name-logo.png"
-                alt="MealHub"
+                alt="Tyme2eat"
                 width={100}
                 height={40}
                 className="h-10 hidden sm:block"
