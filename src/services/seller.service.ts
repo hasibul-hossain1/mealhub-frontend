@@ -2,6 +2,9 @@ import { OrderStatus } from "@/constant/orderStatus";
 import { env } from "@/env";
 import { cookies } from "next/headers";
 
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
 export type AddMealPayload = {
   categoryId: string;
   name: string;
@@ -11,6 +14,69 @@ export type AddMealPayload = {
 };
 
 export type UpdateMealPayload = AddMealPayload;
+
+export type CompleteSellerProfilePayload = {
+  restaurantName: string;
+  description?: string;
+  address: string;
+  phoneNumber: string;
+};
+
+export type SellerProfile = {
+  id: string;
+  userId: string;
+  restaurantName: string | null;
+  description: string | null;
+  address: string | null;
+  phoneNumber: string | null;
+  isProfileCompleted: boolean;
+  isApproved: boolean;
+  isOpen: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type SellerProfileResponse = {
+  success: boolean;
+  data: SellerProfile;
+  message?: string;
+};
+
+const isNullableString = (value: unknown) =>
+  value === null || typeof value === "string";
+
+const isSellerProfile = (value: unknown): value is SellerProfile => {
+  if (!isObject(value)) return false;
+
+  return (
+    typeof value.id === "string" &&
+    typeof value.userId === "string" &&
+    isNullableString(value.restaurantName) &&
+    isNullableString(value.description) &&
+    isNullableString(value.address) &&
+    isNullableString(value.phoneNumber) &&
+    typeof value.isProfileCompleted === "boolean" &&
+    typeof value.isApproved === "boolean" &&
+    typeof value.isOpen === "boolean" &&
+    typeof value.createdAt === "string" &&
+    typeof value.updatedAt === "string"
+  );
+};
+
+export const extractSellerProfile = (payload: unknown): SellerProfile | null => {
+  if (isSellerProfile(payload)) return payload;
+
+  if (!isObject(payload)) return null;
+
+  if (isSellerProfile(payload.data)) return payload.data;
+
+  const nestedData = payload.data;
+  if (isObject(nestedData) && isSellerProfile(nestedData.data)) {
+    return nestedData.data;
+  }
+
+  return null;
+};
 
 export const sellerService = {
   createSeller: async (seller: {
@@ -37,6 +103,67 @@ export const sellerService = {
     } catch (error) {
       return { data: null, error };
     }
+  },
+  getSellerProfile: async () => {
+    try {
+      const cookieStore = await cookies();
+      const res = await fetch(`${env.BACKEND_URL}/seller/my-seller-profile`, {
+        cache: "no-store",
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+      });
+
+      const data = (await res.json().catch(() => null)) as
+        | SellerProfileResponse
+        | SellerProfile
+        | null;
+
+      if (!res.ok) {
+        const message =
+          isObject(data) &&
+          "message" in data &&
+          typeof data.message === "string"
+            ? data.message
+            : "Failed to fetch seller profile.";
+
+        return { data, error: message };
+      }
+
+      return { data, error: null };
+    } catch (error: unknown) {
+      return {
+        data: null as SellerProfileResponse | SellerProfile | null,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An error occurred while fetching the seller profile.",
+      };
+    }
+  },
+  completeProfile: async (payload: CompleteSellerProfilePayload) => {
+    const cookieStore = await cookies();
+    const res = await fetch(`${env.BACKEND_URL}/seller/my-seller-profile`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Cookie: cookieStore.toString(),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      const message =
+        isObject(data) && typeof data.message === "string"
+          ? data.message
+          : "Failed to complete seller profile.";
+
+      throw new Error(message);
+    }
+
+    return data;
   },
   myMeals: async () => {
     try {

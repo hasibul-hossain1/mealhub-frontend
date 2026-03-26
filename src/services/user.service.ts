@@ -55,14 +55,15 @@ export const userService = {
   getSession: async () => {
     try {
       const cookieStore = await cookies();
-      const res = await fetch("http://localhost:5000/api/v1/auth/get-session", {
+
+      const res = await fetch(`${env.BACKEND_URL}/auth/get-session`, {
         cache: "no-store",
         headers: {
-          cookie: cookieStore.toString(),
+          Cookie: cookieStore.toString(),
         },
       });
 
-      const payload = await res.json();
+      const payload = await res.json().catch(() => null);
       const user = getUserFromPayload(payload);
       const session = getSessionFromPayload(payload);
 
@@ -75,6 +76,7 @@ export const userService = {
       }
 
       return { user, session, error: null };
+      
     } catch (error: unknown) {
       return {
         user: null,
