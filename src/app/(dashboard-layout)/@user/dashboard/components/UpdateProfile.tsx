@@ -1,7 +1,7 @@
 "use client"
 import { updateProfileAction } from "@/action/updateProfile.action"
 import { toast } from "sonner"
-import { useTransition } from "react"
+import { useState, useTransition } from "react"
 import {
   Dialog,
   DialogClose,
@@ -13,11 +13,14 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Field, FieldGroup } from "@/components/ui/field"
+import { ImageUploadField } from "@/components/ui/image-upload-field"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
 export function UpdateProfile({ name, imageUrl }: { name: string, imageUrl: string }) {
   const [isPending, startTransition] = useTransition()
+  const [currentImage, setCurrentImage] = useState(imageUrl ?? "")
+  const [isImageUploading, setIsImageUploading] = useState(false)
 
   const handleSubmit = async (formData: FormData) => {
     startTransition(async () => {
@@ -37,7 +40,17 @@ export function UpdateProfile({ name, imageUrl }: { name: string, imageUrl: stri
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-sm">
-        <form action={handleSubmit}>
+        <form
+          action={handleSubmit}
+          onSubmit={(event) => {
+            if (!isImageUploading) {
+              return
+            }
+
+            event.preventDefault()
+            toast.error("Please wait for the image upload to finish.")
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Update Profile</DialogTitle>
           </DialogHeader>
@@ -49,7 +62,14 @@ export function UpdateProfile({ name, imageUrl }: { name: string, imageUrl: stri
             </Field>
             <Field>
               <Label>Image</Label>
-              <Input name="image" defaultValue={imageUrl ?? ""} />
+              <ImageUploadField
+                name="image"
+                value={currentImage}
+                onChange={setCurrentImage}
+                onUploadStateChange={setIsImageUploading}
+                disabled={isPending}
+                previewAlt="Profile image preview"
+              />
             </Field>
           </FieldGroup>
 
@@ -60,7 +80,7 @@ export function UpdateProfile({ name, imageUrl }: { name: string, imageUrl: stri
               </Button>
             </DialogClose>
 
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || isImageUploading}>
               {isPending ? "Saving..." : "Save changes"}
             </Button>
           </DialogFooter>

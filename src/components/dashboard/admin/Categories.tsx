@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import type { MealCategory } from '@/types/meal.type'
 import { Button } from '@/components/ui/button'
+import { ImageUploadField } from '@/components/ui/image-upload-field'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { X } from 'lucide-react'
@@ -30,6 +31,7 @@ const formatDateTime = (value?: string) => {
 export default function Categories({ categories }: CategoriesProps) {
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isImageUploading, setIsImageUploading] = useState(false)
   const [formState, setFormState] = useState({ name: '', imageUrl: '' })
   const [fieldErrors, setFieldErrors] = useState<{ name?: string; imageUrl?: string }>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -79,6 +81,10 @@ export default function Categories({ categories }: CategoriesProps) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (isSubmitting) return
+    if (isImageUploading) {
+      toast.error('Please wait for the image upload to finish.')
+      return
+    }
 
     const nextErrors = validateForm()
     setFieldErrors(nextErrors)
@@ -193,7 +199,7 @@ export default function Categories({ categories }: CategoriesProps) {
                   Keep names short and images crisp for a better browsing experience.
                 </p>
               </div>
-              <Button type='submit' disabled={isSubmitting}>
+              <Button type='submit' disabled={isSubmitting || isImageUploading}>
                 {isSubmitting ? 'Creating...' : 'Create Category'}
               </Button>
             </div>
@@ -219,16 +225,17 @@ export default function Categories({ categories }: CategoriesProps) {
 
               <div className='space-y-2'>
                 <Label htmlFor='category-image'>Image URL</Label>
-                <Input
+                <ImageUploadField
                   id='category-image'
-                  placeholder='https://...'
                   value={formState.imageUrl}
-                  onChange={(event) => {
-                    setFormState((previous) => ({ ...previous, imageUrl: event.target.value }))
+                  onChange={(value) => {
+                    setFormState((previous) => ({ ...previous, imageUrl: value }))
                     setFieldErrors((prev) => ({ ...prev, imageUrl: undefined }))
                     setSubmitError(null)
                   }}
-                  aria-invalid={Boolean(fieldErrors.imageUrl)}
+                  onUploadStateChange={setIsImageUploading}
+                  disabled={isSubmitting}
+                  previewAlt='Category image preview'
                 />
                 {fieldErrors.imageUrl ? (
                   <p className='text-xs text-rose-600'>{fieldErrors.imageUrl}</p>

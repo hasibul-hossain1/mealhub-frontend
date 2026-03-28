@@ -7,6 +7,7 @@ import { BadgeDollarSign, ImageIcon, Layers3, Soup, Sparkles } from "lucide-reac
 import { addMeal, getCategories } from "@/action/seller.action"
 import { Button } from "@/components/ui/button"
 import { Field, FieldError, FieldGroup } from "@/components/ui/field"
+import { ImageUploadField } from "@/components/ui/image-upload-field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -51,6 +52,7 @@ function AddMeal() {
   const [fieldErrors, setFieldErrors] = useState<AddMealFieldErrors>({})
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isImageUploading, setIsImageUploading] = useState(false)
   const [isCategoryLoading, setIsCategoryLoading] = useState(true)
   const [categoryError, setCategoryError] = useState<string | null>(null)
   const [categories, setCategories] = useState<{ id: string; name: string }[]>([])
@@ -145,6 +147,11 @@ function AddMeal() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (isImageUploading) {
+      toast.error("Please wait for the image upload to finish.")
+      return
+    }
 
     setSubmitError(null)
 
@@ -319,17 +326,15 @@ function AddMeal() {
               <Field className="space-y-2">
                 <Label htmlFor="imageUrl" className="flex items-center gap-2">
                   <ImageIcon className="size-4 text-primary" />
-                  Image URL
+                  Meal Image
                 </Label>
-                <Input
+                <ImageUploadField
                   id="imageUrl"
-                  type="url"
                   value={formState.imageUrl}
-                  onChange={(event) => handleChange("imageUrl", event.target.value)}
-                  placeholder="https://example.com/meal.jpg"
-                  aria-invalid={Boolean(fieldErrors.imageUrl)}
-                  className="h-11 bg-background/80"
-                  required
+                  onChange={(value) => handleChange("imageUrl", value)}
+                  onUploadStateChange={setIsImageUploading}
+                  disabled={isSubmitting}
+                  previewAlt="Meal image preview"
                 />
                 <FieldError>{fieldErrors.imageUrl}</FieldError>
               </Field>
@@ -341,7 +346,11 @@ function AddMeal() {
                   {submitError}
                 </p>
               )}
-              <Button type="submit" disabled={isSubmitting || isCategoryLoading} className="h-11 font-semibold">
+              <Button
+                type="submit"
+                disabled={isSubmitting || isCategoryLoading || isImageUploading}
+                className="h-11 font-semibold"
+              >
                 {isSubmitting ? "Adding..." : "Add Meal"}
               </Button>
             </div>

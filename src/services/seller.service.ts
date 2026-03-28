@@ -143,7 +143,7 @@ export const sellerService = {
   },
   completeProfile: async (payload: CompleteSellerProfilePayload) => {
     const cookieStore = await cookies();
-    const res = await fetch(`${env.BACKEND_URL}/seller/my-seller-profile`, {
+    const res = await fetch(`${env.BACKEND_URL}/seller/complete-profile`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -156,11 +156,14 @@ export const sellerService = {
 
     if (!res.ok) {
       const message =
-        isObject(data) && typeof data.message === "string"
+        isObject(data) &&
+        (typeof data.message === "string"
           ? data.message
-          : "Failed to complete seller profile.";
+          : typeof data.error === "string"
+            ? data.error
+            : null);
 
-      throw new Error(message);
+      throw new Error(message || "Failed to complete seller profile.");
     }
 
     return data;

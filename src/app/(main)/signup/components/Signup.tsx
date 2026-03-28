@@ -6,6 +6,7 @@ import { Eye, EyeOff, ShieldCheck, Sparkles, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
+import { ImageUploadField } from "@/components/ui/image-upload-field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
 
@@ -16,10 +17,17 @@ function Signup() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isImageUploading, setIsImageUploading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (isImageUploading) {
+      toast.error("Please wait for the image upload to finish.")
+      return
+    }
+
     setIsSubmitting(true)
     const toastId = toast.loading("Creating account...")
 
@@ -123,15 +131,14 @@ function Signup() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="image" className="text-sm font-medium text-foreground">Image URL</label>
-            <Input
+            <label htmlFor="image" className="text-sm font-medium text-foreground">Profile Image</label>
+            <ImageUploadField
               id="image"
-              type="url"
-              placeholder="https://example.com/avatar.jpg"
-              autoComplete="url"
               value={image}
-              onChange={(event) => setImage(event.target.value)}
-              className="h-11 bg-background/70 transition focus-visible:ring-primary/50"
+              onChange={setImage}
+              onUploadStateChange={setIsImageUploading}
+              disabled={isSubmitting}
+              previewAlt="Profile image preview"
             />
           </div>
 
@@ -161,7 +168,11 @@ function Signup() {
             </div>
           </div>
 
-          <Button type="submit" className="mt-2 h-11 w-full font-semibold" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="mt-2 h-11 w-full font-semibold"
+            disabled={isSubmitting || isImageUploading}
+          >
             {isSubmitting ? "Signing up..." : "Sign up"}
           </Button>
         </form>

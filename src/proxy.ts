@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { userService } from "./services/user.service";
 import { Role } from "@/constant/role";
+import { extractSellerProfile, sellerService } from "@/services/seller.service";
 
 export async function proxy(req: NextRequest) {
   const { user, session } = await userService.getSession();
@@ -10,6 +11,7 @@ export async function proxy(req: NextRequest) {
   const isAuthenticated = Boolean(user && session);
   const role = user?.role;
   const isBanned = user?.isActive === false;
+  const isCompleteProfilePath = pathname.startsWith("/complete-profile");
 
   if (isBanned) {
     return NextResponse.redirect(new URL("/banned", req.url));
@@ -32,6 +34,10 @@ export async function proxy(req: NextRequest) {
     return NextResponse.redirect(new URL("/signin", req.url));
   }
 
+  if (isCompleteProfilePath && !isAuthenticated) {
+    return NextResponse.redirect(new URL("/signin", req.url));
+  }
+
   // 🚫 Logged in → block signin/signup pages
   if (
     (pathname.startsWith("/signin") || pathname.startsWith("/signup")) &&
@@ -43,6 +49,36 @@ export async function proxy(req: NextRequest) {
   // Authenticated but trying to access seller signup → block
   if (isAuthenticated && pathname.startsWith("/seller-signup")) {
     return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  if (isCompleteProfilePath && role !== Role.SELLER) {
+    if (role === Role.ADMIN) {
+      return NextResponse.redirect(new URL("/admin-dashboard", req.url));
+    }
+
+    if (role === Role.CUSTOMER) {
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  if (isAuthenticated && role === Role.SELLER) {
+    const shouldCheckSellerProfile = isDashboardPath || isCompleteProfilePath;
+
+    if (shouldCheckSellerProfile) {
+      const { data } = await sellerService.getSellerProfile();
+      const sellerProfile = extractSellerProfile(data);
+      const isSellerProfileCompleted = sellerProfile?.isProfileCompleted === true;
+
+      if (!isSellerProfileCompleted && !isCompleteProfilePath) {
+        return NextResponse.redirect(new URL("/complete-profile", req.url));
+      }
+
+      if (isSellerProfileCompleted && isCompleteProfilePath) {
+        return NextResponse.redirect(new URL("/seller-dashboard", req.url));
+      }
+    }
   }
 
   // 🔐 Role-based dashboard routing
@@ -94,6 +130,7 @@ export const config = {
     "/signin",
     "/signup",
     "/seller-signup",
+    "/complete-profile",
     "/dashboard/:path*",
     "/admin-dashboard/:path*",
     "/seller-dashboard/:path*",

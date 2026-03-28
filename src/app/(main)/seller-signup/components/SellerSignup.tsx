@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { Eye, EyeOff, ShieldCheck, Sparkles, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
+import { ImageUploadField } from "@/components/ui/image-upload-field"
 import { Input } from "@/components/ui/input"
 import { createSeller } from "@/action/seller.action"
 import Link from "next/link"
@@ -16,10 +17,17 @@ function SellerSignUp() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isImageUploading, setIsImageUploading] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (isImageUploading) {
+      toast.error("Please wait for the image upload to finish.")
+      return
+    }
+
     setIsSubmitting(true)
     const toastId = toast.loading("Creating seller account...")
 
@@ -138,16 +146,15 @@ function SellerSignUp() {
 
           <div className="space-y-2">
             <label htmlFor="image" className="text-sm font-medium text-foreground">
-              Image URL
+              Profile Image
             </label>
-            <Input
+            <ImageUploadField
               id="image"
-              type="url"
-              placeholder="https://example.com/avatar.jpg"
-              autoComplete="url"
               value={image}
-              onChange={(event) => setImage(event.target.value)}
-              className="h-11 bg-background/70 transition focus-visible:ring-primary/50"
+              onChange={setImage}
+              onUploadStateChange={setIsImageUploading}
+              disabled={isSubmitting}
+              previewAlt="Seller profile image preview"
             />
           </div>
 
@@ -182,7 +189,7 @@ function SellerSignUp() {
           <Button
             type="submit"
             className="mt-2 h-11 w-full font-semibold"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isImageUploading}
           >
             {isSubmitting ? "Creating Account..." : "Create Seller Account"}
           </Button>

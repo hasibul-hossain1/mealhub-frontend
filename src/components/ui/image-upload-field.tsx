@@ -70,6 +70,27 @@ export function ImageUploadField({
     onUploadStateChange?.(isUploading)
   }, [isUploading, onUploadStateChange])
 
+  useEffect(() => {
+    if (isUploading) {
+      return
+    }
+
+    const trimmedValue = value.trim()
+
+    if (!trimmedValue) {
+      setLocalPreview(null)
+      return
+    }
+
+    if (localPreview?.startsWith("data:")) {
+      return
+    }
+
+    if (localPreview !== trimmedValue) {
+      setLocalPreview(trimmedValue)
+    }
+  }, [isUploading, localPreview, value])
+
   const previewSrc = localPreview ?? value.trim() ?? null
 
   const openFilePicker = () => {
