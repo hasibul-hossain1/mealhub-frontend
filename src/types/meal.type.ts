@@ -79,3 +79,26 @@ export interface MealDetailsResponse {
   data: Meal
   message: string
 }
+
+export type PaymentMethod = "COD" | "STRIPE"
+
+export interface OrderItem {
+  mealId: string
+  quantity: number
+}
+
+export interface CreateOrderPayload {
+  address: string
+  items: OrderItem[]
+  paymentMethod: PaymentMethod
+}
+
+export interface OrderResponse {
+  success: boolean
+  data?: {
+    checkoutUrl?: string
+    orderId?: string
+    [key: string]: any
+  }
+  message: string
+}

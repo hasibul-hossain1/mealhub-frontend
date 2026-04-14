@@ -1,6 +1,7 @@
 "use client"
 import {
   BadgeCheck,
+  CreditCard,
   Minus,
   Plus,
   ShoppingBag,
@@ -12,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/hooks/use-cart"
 import { useEffect, useState } from "react"
-import { Meal } from "@/types/meal.type"
+import { Meal, PaymentMethod } from "@/types/meal.type"
 import { getCartMeal } from "@/action/meal.action"
 import Image from "next/image"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -41,6 +42,8 @@ function Cart() {
   const [isLoading, setIsLoading] = useState(false)
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [address, setAddress] = useState("")
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD")
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     if (cart.items.length === 0) {
@@ -111,13 +114,26 @@ function Cart() {
     }
 
     const toastId = toast.loading("Please wait, placing your order...")
+    setIsProcessing(true)
 
     try {
       const orderPayload = {
         address: address.trim(),
-        items: cart.items
+        items: cart.items,
+        paymentMethod: paymentMethod,
       }
-      await createOrder(orderPayload)
+      
+      const response = await createOrder(orderPayload)
+
+      // Handle Stripe redirect if checkout URL is provided
+      if (response?.data?.checkoutUrl) {
+        toast.success("Redirecting to Stripe checkout...", { id: toastId })
+        // Redirect to Stripe checkout
+        window.location.href = response.data.checkoutUrl
+        return
+      }
+
+      // Handle COD success
       clearCart()
       toast.success("Order placed successfully.", { id: toastId })
     } catch (error: unknown) {
@@ -125,10 +141,9 @@ function Cart() {
         error instanceof Error ? error.message : "Order failed to place.",
         { id: toastId }
       )
+    } finally {
+      setIsProcessing(false)
     }
-
-
-
   }
 
   return (
@@ -300,18 +315,61 @@ function Cart() {
                   <span>Total</span>
                   <span>{currency.format(total)}</span>
                 </div>
-                <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-3">
-                  <div className="flex items-center gap-2">
-                    <BadgeCheck className="size-4 text-emerald-700" />
-                    <p className="text-xs font-semibold uppercase tracking-widest text-emerald-700">
-                      Cash on Delivery
-                    </p>
+
+                <div className="mt-6">
+                  <h3 className="text-base font-bold text-foreground mb-3">Payment Method</h3>
+                  <div className="space-y-3">
+                    {/* Cash on Delivery Option */}
+                    <label className="flex items-center gap-3 p-3 rounded-2xl border-2 cursor-pointer transition-colors"
+                      style={{
+                        borderColor: paymentMethod === "COD" ? "rgb(16, 185, 129)" : "rgb(229, 231, 235)",
+                        backgroundColor: paymentMethod === "COD" ? "rgba(16, 185, 129, 0.05)" : "transparent",
+                      }}>
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="COD"
+                        checked={paymentMethod === "COD"}
+                        onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground">Cash on Delivery</p>
+                        <p className="text-xs text-muted-foreground">Pay with cash when your order arrives</p>
+                      </div>
+                      <BadgeCheck className="size-5 text-emerald-600" />
+                    </label>
+
+                    {/* Stripe Option */}
+                    <label className="flex items-center gap-3 p-3 rounded-2xl border-2 cursor-pointer transition-colors"
+                      style={{
+                        borderColor: paymentMethod === "STRIPE" ? "rgb(59, 130, 246)" : "rgb(229, 231, 235)",
+                        backgroundColor: paymentMethod === "STRIPE" ? "rgba(59, 130, 246, 0.05)" : "transparent",
+                      }}>
+                      <input
+                        type="radio"
+                        name="payment-method"
+                        value="STRIPE"
+                        checked={paymentMethod === "STRIPE"}
+                        onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
+                        className="w-4 h-4 cursor-pointer"
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-foreground">Stripe</p>
+                        <p className="text-xs text-muted-foreground">Secure online payment with Stripe</p>
+                      </div>
+                      <CreditCard className="size-5 text-blue-600" />
+                    </label>
                   </div>
-                  <p className="mt-1 text-xs text-emerald-800">
-                    Pay with cash when your order arrives at your doorstep.
-                  </p>
                 </div>
-                <Button onClick={handleOrder} className="mt-5 w-full">Proceed to checkout</Button>
+
+                <Button 
+                  onClick={handleOrder} 
+                  disabled={isProcessing}
+                  className="mt-6 w-full"
+                >
+                  {isProcessing ? "Processing..." : "Proceed to checkout"}
+                </Button>
                 <p className="mt-3 text-xs text-muted-foreground">By placing your order, you agree to Tyme2eat policies.</p>
               </div>
 

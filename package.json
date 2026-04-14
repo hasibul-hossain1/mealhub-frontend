@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@smastrom/react-rating": "^1.5.0",
+    "@stripe/stripe-js": "^9.2.0",
     "@t3-oss/env-nextjs": "^0.13.10",
     "better-auth": "^1.4.18",
     "class-variance-authority": "^0.7.1",

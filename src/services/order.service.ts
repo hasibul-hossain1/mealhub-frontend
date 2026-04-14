@@ -1,13 +1,9 @@
 import { env } from "@/env";
 import { cookies } from "next/headers";
-
-type createOrderPayload = {
-  address: string;
-  items: { mealId: string; quantity: number }[];
-};
+import { CreateOrderPayload } from "@/types";
 
 export const orderService = {
-  createOrder: async (payload: createOrderPayload) => {
+  createOrder: async (payload: CreateOrderPayload) => {
     const cookieStore = await cookies();
     const res = await fetch(`${env.BACKEND_URL}/orders`, {
       method: "POST",
