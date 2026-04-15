@@ -3,8 +3,15 @@
 import { Button } from "@/components/ui/button"
 import { CheckCircle } from "lucide-react"
 import Link from "next/link"
+import { useEffect } from "react"
+import { useCart } from "@/hooks/use-cart"
 
 export default function OrderSuccessPage() {
+  const { clearCart } = useCart()
+
+  useEffect(() => {
+    clearCart()
+  }, [clearCart])
   return (
     <section className="min-h-screen w-full bg-muted/30 flex items-center justify-center">
       <div className="relative overflow-hidden">

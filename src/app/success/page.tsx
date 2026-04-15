@@ -5,14 +5,18 @@ import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import { useCart } from "@/hooks/use-cart";
 
 export default function SuccessPage() {
+  const { clearCart } = useCart();
+
   useEffect(() => {
+    clearCart();
     toast.success("Payment successful! Your order has been confirmed.");
-  }, []);
+  }, [clearCart]);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-emerald-50 via-background to-emerald-50/30 flex items-center justify-center px-4">
+    <div className="min-h-screen w-full bg-linear-to-br from-emerald-50 via-background to-emerald-50/30 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="rounded-3xl border border-emerald-200 bg-background/80 backdrop-blur p-8 shadow-lg text-center">
           {/* Success Icon */}

@@ -25,6 +25,9 @@ type SellerOrder = {
   createdAt: string
   updatedAt: string
   address: string
+  isPaid: boolean
+  paymentMethod: string
+  paidAt: string | null
   user: {
     name: string
   }
@@ -77,6 +80,21 @@ const getStatusClassName = (status: string) => {
   }
 
   return 'bg-amber-100 text-amber-700'
+}
+
+const getPaymentStatusClassName = (isPaid: boolean) => {
+  return isPaid ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'
+}
+
+const formatPaymentMethod = (method: string) => {
+  const normalized = method.toUpperCase()
+  if (normalized === 'COD') {
+    return 'Cash on Delivery'
+  }
+  if (normalized === 'STRIPE') {
+    return 'Stripe'
+  }
+  return method
 }
 
 const formatStatus = (status: string) =>
@@ -150,6 +168,8 @@ function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
               <th className='px-4 py-3 font-medium'>Customer ID</th>
               <th className='px-4 py-3 font-medium'>Status</th>
               <th className='px-4 py-3 font-medium'>Total</th>
+              <th className='px-4 py-3 font-medium'>Payment Method</th>
+              <th className='px-4 py-3 font-medium'>Payment Status</th>
               <th className='px-4 py-3 font-medium'>Address</th>
               <th className='px-4 py-3 font-medium'>Created</th>
               <th className='px-4 py-3 font-medium'>Updated</th>
@@ -170,6 +190,16 @@ function SellerOrdersTable({ orders }: SellerOrdersTableProps) {
                   </span>
                 </td>
                 <td className='px-4 py-3 font-medium'>{currency.format(order.totalPrice)}</td>
+                <td className='px-4 py-3'>
+                  <span className='text-sm text-muted-foreground'>{formatPaymentMethod(order.paymentMethod)}</span>
+                </td>
+                <td className='px-4 py-3'>
+                  <span
+                    className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${getPaymentStatusClassName(order.isPaid)}`}
+                  >
+                    {order.isPaid ? 'Paid' : 'Unpaid'}
+                  </span>
+                </td>
                 <td className='max-w-56 px-4 py-3 text-muted-foreground'>{order.address}</td>
                 <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.createdAt)}</td>
                 <td className='px-4 py-3 text-muted-foreground'>{formatDateTime(order.updatedAt)}</td>

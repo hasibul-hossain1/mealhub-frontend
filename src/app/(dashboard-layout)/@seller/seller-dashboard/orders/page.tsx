@@ -9,6 +9,9 @@ type SellerOrder = {
   createdAt: string
   updatedAt: string
   address: string
+  isPaid: boolean
+  paymentMethod: string
+  paidAt: string | null
   user: {
     name: string
   }
@@ -36,6 +39,9 @@ const isSellerOrderList = (value: unknown): value is SellerOrder[] => {
       typeof order.createdAt === 'string' &&
       typeof order.updatedAt === 'string' &&
       typeof order.address === 'string' &&
+      typeof order.isPaid === 'boolean' &&
+      typeof order.paymentMethod === 'string' &&
+      (order.paidAt === null || typeof order.paidAt === 'string') &&
       order.user &&
       typeof order.user === 'object' &&
       typeof (order.user as { name?: string }).name === 'string'

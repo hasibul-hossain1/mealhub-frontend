@@ -127,6 +127,8 @@ function Cart() {
 
       // Handle Stripe redirect if checkout URL is provided
       if (response?.data?.checkoutUrl) {
+        // Clear cart before redirecting to Stripe
+        clearCart()
         toast.success("Redirecting to Stripe checkout...", { id: toastId })
         // Redirect to Stripe checkout
         window.location.href = response.data.checkoutUrl

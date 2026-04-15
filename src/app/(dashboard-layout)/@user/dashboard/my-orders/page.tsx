@@ -8,6 +8,7 @@ import {
   ReceiptText,
   Truck,
   XCircle,
+  CreditCard,
 } from "lucide-react"
 import Image from "next/image"
 
@@ -31,6 +32,9 @@ type Order = {
   createdAt: string
   updatedAt: string
   address: string
+  isPaid: boolean
+  paymentMethod: string
+  paidAt: string | null
   orderItems: OrderItem[]
 }
 
@@ -93,6 +97,29 @@ const getStatusMeta = (status: string) => {
   }
 }
 
+const formatPaymentMethod = (method: string) => {
+  const normalized = method.toUpperCase()
+  if (normalized === "COD") {
+    return "Cash on Delivery"
+  }
+  if (normalized === "STRIPE") {
+    return "Stripe"
+  }
+  return method
+}
+
+const getPaymentStatusMeta = (isPaid: boolean) => {
+  return isPaid
+    ? {
+        chipClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
+        label: "Paid",
+      }
+    : {
+        chipClass: "border-red-200 bg-red-50 text-red-700",
+        label: "Unpaid",
+      }
+}
+
 const isOrderList = (value: unknown): value is Order[] => {
   if (!Array.isArray(value)) return false
 
@@ -105,6 +132,9 @@ const isOrderList = (value: unknown): value is Order[] => {
       typeof order.totalPrice === "number" &&
       typeof order.createdAt === "string" &&
       typeof order.address === "string" &&
+      typeof order.isPaid === "boolean" &&
+      typeof order.paymentMethod === "string" &&
+      (order.paidAt === null || typeof order.paidAt === "string") &&
       Array.isArray(order.orderItems)
     )
   })
@@ -212,6 +242,26 @@ async function MyOrdersPage() {
                   <div className="rounded-xl border border-border/60 bg-muted/35 p-3">
                     <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Address</p>
                     <p className="mt-1 line-clamp-2 text-sm font-medium text-foreground">{order.address}</p>
+                  </div>
+                </div>
+
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-xl border border-border/60 bg-muted/35 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Payment Method</p>
+                    <p className="mt-1 text-sm font-medium text-foreground">{formatPaymentMethod(order.paymentMethod)}</p>
+                  </div>
+                  <div className="rounded-xl border border-border/60 bg-muted/35 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">Payment Status</p>
+                    <div className="mt-1">
+                      {(() => {
+                        const paymentStatus = getPaymentStatusMeta(order.isPaid)
+                        return (
+                          <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${paymentStatus.chipClass}`}>
+                            {paymentStatus.label}
+                          </span>
+                        )
+                      })()}
+                    </div>
                   </div>
                 </div>
 

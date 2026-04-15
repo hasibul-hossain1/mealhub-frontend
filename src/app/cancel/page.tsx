@@ -12,7 +12,7 @@ export default function CancelPage() {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-red-50 via-background to-red-50/30 flex items-center justify-center px-4">
+    <div className="min-h-screen w-full bg-linear-to-br from-red-50 via-background to-red-50/30 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="rounded-3xl border border-red-200 bg-background/80 backdrop-blur p-8 shadow-lg text-center">
           {/* Alert Icon */}
@@ -35,7 +35,7 @@ export default function CancelPage() {
           {/* Info Box */}
           <div className="rounded-2xl bg-red-50/50 border border-red-200 p-4 mb-6">
             <p className="text-sm text-red-900">
-              You can continue shopping and try again whenever you're ready. Your cart items won't expire.
+              You can continue shopping and try again whenever you&apos;re ready. Your cart items won&apos;t expire.
             </p>
           </div>
 
