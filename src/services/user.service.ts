@@ -51,15 +51,29 @@ const getSessionFromPayload = (payload: unknown): unknown | null => {
   return null;
 };
 
+const SESSION_COOKIE_NAMES = [
+  "__Secure-better-auth.session_token",
+  "better-auth.session_token",
+];
+
 export const userService = {
   getSession: async () => {
     try {
       const cookieStore = await cookies();
+      const cookieHeader = cookieStore.toString();
+
+      const hasSessionCookie = SESSION_COOKIE_NAMES.some((name) =>
+        cookieHeader.includes(name)
+      );
+      if (!hasSessionCookie) {
+        return { user: null, session: null, error: null };
+      }
 
       const res = await fetch(`${env.BACKEND_URL}/auth/get-session`, {
         cache: "no-store",
         headers: {
-          Cookie: cookieStore.toString(),
+          Cookie: cookieHeader,
+          Origin: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
         },
       });
 

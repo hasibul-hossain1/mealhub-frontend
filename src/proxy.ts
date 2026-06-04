@@ -1,4 +1,4 @@
-// middleware/proxy.ts
+// middleware/middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 import { userService } from "./services/user.service";
 import { Role } from "@/constant/role";
@@ -6,6 +6,7 @@ import { extractSellerProfile, sellerService } from "@/services/seller.service";
 
 export async function proxy(req: NextRequest) {
   const { user, session } = await userService.getSession();
+
   const pathname = req.nextUrl.pathname;
 
   const isAuthenticated = Boolean(user && session);

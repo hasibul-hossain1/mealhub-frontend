@@ -25,7 +25,9 @@ type SessionUserView = {
 
 function GetStarted() {
   const { data, error, isPending, isRefetching } = authClient.useSession()
+
   const user = data?.user as SessionUserView | undefined
+  console.log("navbar",user);
   const roleLabel = user?.role ?? "USER"
   const router = useRouter()
 
